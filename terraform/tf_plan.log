@@ -1,0 +1,908 @@
+2025-10-23T08:55:29.5849007Z ##[section]Starting: Terraform Plan
+2025-10-23T08:55:29.5854630Z ==============================================================================
+2025-10-23T08:55:29.5854769Z Task         : Bash
+2025-10-23T08:55:29.5854828Z Description  : Run a Bash script on macOS, Linux, or Windows
+2025-10-23T08:55:29.5854918Z Version      : 3.259.0
+2025-10-23T08:55:29.5855002Z Author       : Microsoft Corporation
+2025-10-23T08:55:29.5855091Z Help         : https://docs.microsoft.com/azure/devops/pipelines/tasks/utility/bash
+2025-10-23T08:55:29.5855193Z ==============================================================================
+2025-10-23T08:55:31.5656073Z Generating script.
+2025-10-23T08:55:31.5667226Z ========================== Starting Command Output ===========================
+2025-10-23T08:55:31.5675315Z [command]/usr/bin/bash /home/azureuser/myagent/_work/_temp/17853d5f-eff3-4e18-b77a-ddd543fd06b4.sh
+2025-10-23T08:55:31.5730237Z === Terraform Plan Configuration ===
+2025-10-23T08:55:31.5734012Z /home/azureuser/myagent/_work/_temp/17853d5f-eff3-4e18-b77a-ddd543fd06b4.sh: line 3: tfVarsFile: command not found
+2025-10-23T08:55:31.5734370Z tfVarsFile variable: ''
+2025-10-23T08:55:31.5738764Z parameters.tfVarsFile: 'environments/em_bofa/walmart.tfvars'
+2025-10-23T08:55:31.5739321Z parameters.environment: 'walmart'
+2025-10-23T08:55:31.5739717Z ====================================
+2025-10-23T08:55:31.5741904Z /home/azureuser/myagent/_work/_temp/17853d5f-eff3-4e18-b77a-ddd543fd06b4.sh: line 9: tfVarsFile: command not found
+2025-10-23T08:55:31.5746895Z ✓ Using tfVarsFile parameter
+2025-10-23T08:55:31.5747470Z Using vars file: environments/em_bofa/walmart.tfvars
+2025-10-23T08:55:31.5747824Z Output plan file: plan_walmart.tfplan
+2025-10-23T08:55:31.5748100Z 
+2025-10-23T08:55:31.5748412Z ✓ Vars file found: environments/em_bofa/walmart.tfvars
+2025-10-23T08:55:31.5756941Z -rw-rw-r-- 1 azureuser azureuser 14K Oct 22 21:53 environments/em_bofa/walmart.tfvars
+2025-10-23T08:55:31.5759582Z 
+2025-10-23T08:55:31.5761468Z File content (first 30 lines):
+2025-10-23T08:55:31.5773875Z # Walmart Environment Configuration for EM NextGen Infrastructure
+2025-10-23T08:55:31.5774404Z # PHASE 2: Full Infrastructure - Networking + VMs + SFTP
+2025-10-23T08:55:31.5775399Z # Spoke network peers to shared CS hub
+2025-10-23T08:55:31.5775610Z 
+2025-10-23T08:55:31.5775843Z # Basic Environment Configuration
+2025-10-23T08:55:31.5776112Z location_code = "US1"
+2025-10-23T08:55:31.5776351Z client        = "BOFA" # Same client as CS for consistent naming
+2025-10-23T08:55:31.5776723Z environment   = "WM"   # WM = Walmart (differentiates from CS)
+2025-10-23T08:55:31.5777044Z environment_code = "WM" # Short code for computer names
+2025-10-23T08:55:31.5777296Z location      = "East US"
+2025-10-23T08:55:31.5777516Z 
+2025-10-23T08:55:31.5777770Z # ========================================
+2025-10-23T08:55:31.5778061Z # MODULE ENABLE/DISABLE FLAGS
+2025-10-23T08:55:31.5778436Z # ========================================
+2025-10-23T08:55:31.5778714Z enable_hub             = false # Use shared CS hub
+2025-10-23T08:55:31.5779015Z enable_sftp            = true  # Enable SFTP
+2025-10-23T08:55:31.5779339Z enable_sftp_automation = false # Disable to avoid Automation Account quota
+2025-10-23T08:55:31.5779753Z enable_web_vms         = true  # Enable Web VMs
+2025-10-23T08:55:31.5780050Z enable_app_vms         = true  # Enable App VMs
+2025-10-23T08:55:31.5780604Z enable_db_vms          = true  # Enable DB VMs
+2025-10-23T08:55:31.5780998Z enable_ado_vms         = true  # Enable ADO agent VMs
+2025-10-23T08:55:31.5781307Z enable_aks             = false # AKS not needed yet
+2025-10-23T08:55:31.5781531Z 
+2025-10-23T08:55:31.5782169Z # Shared Hub Configuration
+2025-10-23T08:55:31.5782456Z use_shared_hub                 = true
+2025-10-23T08:55:31.5782712Z shared_hub_vnet_name           = "US1-BOFA-CS-HUB-VNET"
+2025-10-23T08:55:31.5783032Z shared_hub_vnet_resource_group = "US1-BOFA-CS-HUB"
+2025-10-23T08:55:31.5783439Z shared_hub_vnet_id             = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-CS-HUB/providers/Microsoft.Network/virtualNetworks/US1-BOFA-CS-HUB-VNET"
+2025-10-23T08:55:31.5784082Z 
+2025-10-23T08:55:31.5784372Z # Spoke Network Configuration - UNIQUE CIDR for Walmart
+2025-10-23T08:55:31.5784584Z 
+2025-10-23T08:55:31.5784792Z Network configuration in tfvars:
+2025-10-23T08:55:31.5798799Z spoke_vnet_address_space = "10.225.0.0/21"
+2025-10-23T08:55:31.5804908Z     address_prefix    = "10.225.0.0/24"
+2025-10-23T08:55:31.5805776Z     address_prefix    = "10.225.1.0/24"
+2025-10-23T08:55:31.5805942Z     address_prefix    = "10.225.2.0/24"
+2025-10-23T08:55:31.5806114Z     address_prefix    = "10.225.3.0/24"
+2025-10-23T08:55:31.5806284Z     address_prefix    = "10.225.4.0/24"
+2025-10-23T08:55:31.5806455Z     address_prefix    = "10.225.5.0/24"
+2025-10-23T08:55:31.5806624Z     address_prefix    = "10.225.6.0/24"
+2025-10-23T08:55:31.5806799Z aadds_address_prefix      = "10.223.26.0/24"
+2025-10-23T08:55:31.5806876Z 
+2025-10-23T08:55:31.5807302Z 🌐 Applying to ALL resources (no targeting)
+2025-10-23T08:55:31.5807393Z 
+2025-10-23T08:55:31.5807600Z Running: terraform plan -var-file="environments/em_bofa/walmart.tfvars" -out="plan_walmart.tfplan"
+2025-10-23T08:55:37.5947183Z [0m[1mrandom_password.oracle_admin_password_02[0]: Refreshing state... [id=none][0m
+2025-10-23T08:55:41.1821492Z [0m[1mdata.azurerm_client_config.current: Reading...[0m[0m
+2025-10-23T08:55:41.1828624Z [0m[1mazurerm_resource_group.environment_rgs["WEB"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB][0m
+2025-10-23T08:55:41.1851542Z [0m[1mdata.azurerm_virtual_network.shared_hub[0]: Reading...[0m[0m
+2025-10-23T08:55:41.1852192Z [0m[1mazurerm_resource_group.environment_rgs["SPOKE"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE][0m
+2025-10-23T08:55:41.1852741Z [0m[1mazurerm_resource_group.environment_rgs["HUB"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-HUB][0m
+2025-10-23T08:55:41.1853297Z [0m[1mazurerm_resource_group.environment_rgs["DS"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DS][0m
+2025-10-23T08:55:41.1854145Z [0m[1mdata.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD1mYTAwMjliNy03OTdjLTRmNWEtYWVkZC0wM2RlYjcxYzk5NDc7b2JqZWN0SWQ9OWVhZDViNmEtZmMxYS00OWY0LTgxNTEtOWNmN2NkNjMyYTQ2O3N1YnNjcmlwdGlvbklkPTg1OTBjMTBkLWFlMDItNDljYS1hOGJiLTQzNWYwNDdjNzFlOTt0ZW5hbnRJZD02MWIxNjY2Yy0wOTM3LTRhNWMtYmQ0OS01ZjVhZGIyZTI0ZDc=][0m
+2025-10-23T08:55:41.1854863Z [0m[1mazurerm_resource_group.environment_rgs["DB"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB][0m
+2025-10-23T08:55:41.1855405Z [0m[1mazurerm_resource_group.environment_rgs["SMTP"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SMTP][0m
+2025-10-23T08:55:41.1855949Z [0m[1mazurerm_resource_group.environment_rgs["SFTP"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SFTP][0m
+2025-10-23T08:55:41.1856484Z [0m[1mazurerm_resource_group.environment_rgs["HSM"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-HSM][0m
+2025-10-23T08:55:41.1901157Z [0m[1mazurerm_resource_group.environment_rgs["LOGI"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-LOGI][0m
+2025-10-23T08:55:41.3451471Z [0m[1mazurerm_resource_group.environment_rgs["ADO"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO][0m
+2025-10-23T08:55:41.3622183Z [0m[1mazurerm_resource_group.environment_rgs["APP"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP][0m
+2025-10-23T08:55:41.4588507Z [0m[1mdata.azurerm_virtual_network.shared_hub[0]: Read complete after 0s [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-CS-HUB/providers/Microsoft.Network/virtualNetworks/US1-BOFA-CS-HUB-VNET][0m
+2025-10-23T08:55:41.7322363Z [0m[1mmodule.app_resources[0].data.azurerm_client_config.current: Reading...[0m[0m
+2025-10-23T08:55:41.7378276Z [0m[1mmodule.app_resources[0].module.keyvault[0].random_string.keyvault_suffix: Refreshing state... [id=aa4g88n0][0m
+2025-10-23T08:55:41.7379739Z [0m[1mmodule.app_resources[0].module.keyvault[0].data.azurerm_client_config.current: Reading...[0m[0m
+2025-10-23T08:55:41.7380163Z [0m[1mmodule.ado_resources[0].module.keyvault[0].random_string.keyvault_suffix: Refreshing state... [id=0eorhslk][0m
+2025-10-23T08:55:41.7380726Z [0m[1mmodule.ado_resources[0].module.keyvault[0].data.azurerm_client_config.current: Reading...[0m[0m
+2025-10-23T08:55:41.7381099Z [0m[1mmodule.ado_resources[0].data.azurerm_client_config.current: Reading...[0m[0m
+2025-10-23T08:55:41.7381469Z [0m[1mmodule.web_resources[0].data.azurerm_client_config.current: Reading...[0m[0m
+2025-10-23T08:55:41.7401606Z [0m[1mmodule.app_resources[0].data.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD1mYTAwMjliNy03OTdjLTRmNWEtYWVkZC0wM2RlYjcxYzk5NDc7b2JqZWN0SWQ9OWVhZDViNmEtZmMxYS00OWY0LTgxNTEtOWNmN2NkNjMyYTQ2O3N1YnNjcmlwdGlvbklkPTg1OTBjMTBkLWFlMDItNDljYS1hOGJiLTQzNWYwNDdjNzFlOTt0ZW5hbnRJZD02MWIxNjY2Yy0wOTM3LTRhNWMtYmQ0OS01ZjVhZGIyZTI0ZDc=][0m
+2025-10-23T08:55:41.7404562Z [0m[1mmodule.web_resources[0].data.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD1mYTAwMjliNy03OTdjLTRmNWEtYWVkZC0wM2RlYjcxYzk5NDc7b2JqZWN0SWQ9OWVhZDViNmEtZmMxYS00OWY0LTgxNTEtOWNmN2NkNjMyYTQ2O3N1YnNjcmlwdGlvbklkPTg1OTBjMTBkLWFlMDItNDljYS1hOGJiLTQzNWYwNDdjNzFlOTt0ZW5hbnRJZD02MWIxNjY2Yy0wOTM3LTRhNWMtYmQ0OS01ZjVhZGIyZTI0ZDc=][0m
+2025-10-23T08:55:41.7405678Z [0m[1mmodule.app_resources[0].module.keyvault[0].data.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD1mYTAwMjliNy03OTdjLTRmNWEtYWVkZC0wM2RlYjcxYzk5NDc7b2JqZWN0SWQ9OWVhZDViNmEtZmMxYS00OWY0LTgxNTEtOWNmN2NkNjMyYTQ2O3N1YnNjcmlwdGlvbklkPTg1OTBjMTBkLWFlMDItNDljYS1hOGJiLTQzNWYwNDdjNzFlOTt0ZW5hbnRJZD02MWIxNjY2Yy0wOTM3LTRhNWMtYmQ0OS01ZjVhZGIyZTI0ZDc=][0m
+2025-10-23T08:55:41.7406796Z [0m[1mmodule.ado_resources[0].module.keyvault[0].data.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD1mYTAwMjliNy03OTdjLTRmNWEtYWVkZC0wM2RlYjcxYzk5NDc7b2JqZWN0SWQ9OWVhZDViNmEtZmMxYS00OWY0LTgxNTEtOWNmN2NkNjMyYTQ2O3N1YnNjcmlwdGlvbklkPTg1OTBjMTBkLWFlMDItNDljYS1hOGJiLTQzNWYwNDdjNzFlOTt0ZW5hbnRJZD02MWIxNjY2Yy0wOTM3LTRhNWMtYmQ0OS01ZjVhZGIyZTI0ZDc=][0m
+2025-10-23T08:55:41.7407889Z [0m[1mmodule.ado_resources[0].data.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD1mYTAwMjliNy03OTdjLTRmNWEtYWVkZC0wM2RlYjcxYzk5NDc7b2JqZWN0SWQ9OWVhZDViNmEtZmMxYS00OWY0LTgxNTEtOWNmN2NkNjMyYTQ2O3N1YnNjcmlwdGlvbklkPTg1OTBjMTBkLWFlMDItNDljYS1hOGJiLTQzNWYwNDdjNzFlOTt0ZW5hbnRJZD02MWIxNjY2Yy0wOTM3LTRhNWMtYmQ0OS01ZjVhZGIyZTI0ZDc=][0m
+2025-10-23T08:55:41.7814727Z [0m[1mmodule.web_resources[0].module.keyvault[0].random_string.keyvault_suffix: Refreshing state... [id=1f2t0irq][0m
+2025-10-23T08:55:41.7815215Z [0m[1mmodule.db_key_vault[0].data.azurerm_client_config.current: Reading...[0m[0m
+2025-10-23T08:55:41.7925122Z [0m[1mmodule.spoke_vnet.data.azurerm_client_config.current: Reading...[0m[0m
+2025-10-23T08:55:41.7927580Z [0m[1mmodule.db_key_vault[0].data.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD1mYTAwMjliNy03OTdjLTRmNWEtYWVkZC0wM2RlYjcxYzk5NDc7b2JqZWN0SWQ9OWVhZDViNmEtZmMxYS00OWY0LTgxNTEtOWNmN2NkNjMyYTQ2O3N1YnNjcmlwdGlvbklkPTg1OTBjMTBkLWFlMDItNDljYS1hOGJiLTQzNWYwNDdjNzFlOTt0ZW5hbnRJZD02MWIxNjY2Yy0wOTM3LTRhNWMtYmQ0OS01ZjVhZGIyZTI0ZDc=][0m
+2025-10-23T08:55:41.7935739Z [0m[1mmodule.web_resources[0].module.keyvault[0].data.azurerm_client_config.current: Reading...[0m[0m
+2025-10-23T08:55:41.7936892Z [0m[1mmodule.web_resources[0].data.azurerm_resource_group.existing_rg[0]: Reading...[0m[0m
+2025-10-23T08:55:41.8117378Z [0m[1mmodule.db_key_vault[0].module.keyvault[0].random_string.keyvault_suffix: Refreshing state... [id=pv17zbbr][0m
+2025-10-23T08:55:41.8121102Z [0m[1mmodule.spoke_vnet.data.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD1mYTAwMjliNy03OTdjLTRmNWEtYWVkZC0wM2RlYjcxYzk5NDc7b2JqZWN0SWQ9OWVhZDViNmEtZmMxYS00OWY0LTgxNTEtOWNmN2NkNjMyYTQ2O3N1YnNjcmlwdGlvbklkPTg1OTBjMTBkLWFlMDItNDljYS1hOGJiLTQzNWYwNDdjNzFlOTt0ZW5hbnRJZD02MWIxNjY2Yy0wOTM3LTRhNWMtYmQ0OS01ZjVhZGIyZTI0ZDc=][0m
+2025-10-23T08:55:41.8123977Z [0m[1mmodule.db_key_vault[0].module.keyvault[0].data.azurerm_client_config.current: Reading...[0m[0m
+2025-10-23T08:55:41.8124555Z [0m[1mmodule.ado_resources[0].data.azurerm_resource_group.existing_rg[0]: Reading...[0m[0m
+2025-10-23T08:55:41.8125001Z [0m[1mmodule.db_key_vault[0].data.azurerm_resource_group.existing_rg[0]: Reading...[0m[0m
+2025-10-23T08:55:41.8125980Z [0m[1mmodule.web_resources[0].module.keyvault[0].data.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD1mYTAwMjliNy03OTdjLTRmNWEtYWVkZC0wM2RlYjcxYzk5NDc7b2JqZWN0SWQ9OWVhZDViNmEtZmMxYS00OWY0LTgxNTEtOWNmN2NkNjMyYTQ2O3N1YnNjcmlwdGlvbklkPTg1OTBjMTBkLWFlMDItNDljYS1hOGJiLTQzNWYwNDdjNzFlOTt0ZW5hbnRJZD02MWIxNjY2Yy0wOTM3LTRhNWMtYmQ0OS01ZjVhZGIyZTI0ZDc=][0m
+2025-10-23T08:55:41.8127323Z [0m[1mmodule.app_resources[0].data.azurerm_resource_group.existing_rg[0]: Reading...[0m[0m
+2025-10-23T08:55:41.8148271Z [0m[1mmodule.db_key_vault[0].module.keyvault[0].data.azurerm_client_config.current: Read complete after 0s [id=Y2xpZW50Q29uZmlncy9jbGllbnRJZD1mYTAwMjliNy03OTdjLTRmNWEtYWVkZC0wM2RlYjcxYzk5NDc7b2JqZWN0SWQ9OWVhZDViNmEtZmMxYS00OWY0LTgxNTEtOWNmN2NkNjMyYTQ2O3N1YnNjcmlwdGlvbklkPTg1OTBjMTBkLWFlMDItNDljYS1hOGJiLTQzNWYwNDdjNzFlOTt0ZW5hbnRJZD02MWIxNjY2Yy0wOTM3LTRhNWMtYmQ0OS01ZjVhZGIyZTI0ZDc=][0m
+2025-10-23T08:55:41.8236629Z [0m[1mmodule.spoke_vnet.data.azurerm_resource_group.existing_rg[0]: Reading...[0m[0m
+2025-10-23T08:55:41.8883371Z [0m[1mmodule.ado_resources[0].data.azurerm_resource_group.existing_rg[0]: Read complete after 0s [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO][0m
+2025-10-23T08:55:41.8944149Z [0m[1mmodule.ado_resources[0].module.keyvault[0].azurerm_key_vault.main: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO/providers/Microsoft.KeyVault/vaults/us1bofawmadokv0eorhslk][0m
+2025-10-23T08:55:41.8999367Z [0m[1mmodule.ado_resources[0].module.scripts_storage[0].azurerm_storage_account.scripts_storage: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO/providers/Microsoft.Storage/storageAccounts/us1bofawmadoscripts][0m
+2025-10-23T08:55:41.9001023Z [0m[1mmodule.web_resources[0].data.azurerm_resource_group.existing_rg[0]: Read complete after 0s [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB][0m
+2025-10-23T08:55:41.9065668Z [0m[1mmodule.web_resources[0].azurerm_user_assigned_identity.appgw[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.ManagedIdentity/userAssignedIdentities/US1-BOFA-WM-WEB-AGW-identity][0m
+2025-10-23T08:55:41.9120076Z [0m[1mmodule.web_resources[0].module.keyvault[0].azurerm_key_vault.main: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.KeyVault/vaults/us1bofawmwebkv1f2t0irq][0m
+2025-10-23T08:55:41.9160218Z [0m[1mmodule.web_resources[0].module.scripts_storage[0].azurerm_storage_account.scripts_storage: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Storage/storageAccounts/us1bofawmwebscripts][0m
+2025-10-23T08:55:41.9288872Z [0m[1mmodule.db_key_vault[0].data.azurerm_resource_group.existing_rg[0]: Read complete after 0s [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB][0m
+2025-10-23T08:55:41.9355474Z [0m[1mmodule.db_key_vault[0].module.keyvault[0].azurerm_key_vault.main: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.KeyVault/vaults/us1bofawmdbkvpv17zbbr][0m
+2025-10-23T08:55:41.9456867Z [0m[1mmodule.app_resources[0].data.azurerm_resource_group.existing_rg[0]: Read complete after 0s [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP][0m
+2025-10-23T08:55:41.9530938Z [0m[1mmodule.app_resources[0].module.keyvault[0].azurerm_key_vault.main: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP/providers/Microsoft.KeyVault/vaults/us1bofawmappkvaa4g88n0][0m
+2025-10-23T08:55:41.9565657Z [0m[1mmodule.app_resources[0].module.scripts_storage[0].azurerm_storage_account.scripts_storage: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP/providers/Microsoft.Storage/storageAccounts/us1bofawmappscripts][0m
+2025-10-23T08:55:42.0070053Z [0m[1mmodule.spoke_vnet.data.azurerm_resource_group.existing_rg[0]: Read complete after 0s [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE][0m
+2025-10-23T08:55:42.0186242Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_group.subnet_nsg["DB-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-DB-SUBNET-NSG][0m
+2025-10-23T08:55:42.0285325Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_group.subnet_nsg["LOGI-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-LOGI-SUBNET-NSG][0m
+2025-10-23T08:55:42.1686472Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_group.subnet_nsg["ADO-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-ADO-SUBNET-NSG][0m
+2025-10-23T08:55:42.2650589Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_group.subnet_nsg["SFTP-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-SFTP-SUBNET-NSG][0m
+2025-10-23T08:55:42.2794689Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_group.subnet_nsg["APP-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-APP-SUBNET-NSG][0m
+2025-10-23T08:55:42.2841836Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_group.subnet_nsg["AG-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-AG-SUBNET-NSG][0m
+2025-10-23T08:55:42.2843171Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_group.subnet_nsg["WEB-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-WEB-SUBNET-NSG][0m
+2025-10-23T08:55:42.4555651Z [0m[1mmodule.spoke_vnet.module.networking[0].module.vnet.azurerm_virtual_network.vnet: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET][0m
+2025-10-23T08:55:42.4886150Z [0m[1mmodule.ado_resources[0].module.keyvault[0].azurerm_key_vault_access_policy.current_user: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO/providers/Microsoft.KeyVault/vaults/us1bofawmadokv0eorhslk/objectId/9ead5b6a-fc1a-49f4-8151-9cf7cd632a46][0m
+2025-10-23T08:55:42.4888011Z [0m[1mmodule.web_resources[0].module.keyvault[0].azurerm_key_vault_access_policy.current_user: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.KeyVault/vaults/us1bofawmwebkv1f2t0irq/objectId/9ead5b6a-fc1a-49f4-8151-9cf7cd632a46][0m
+2025-10-23T08:55:42.4889325Z [0m[1mmodule.db_key_vault[0].module.keyvault[0].azurerm_key_vault_access_policy.current_user: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.KeyVault/vaults/us1bofawmdbkvpv17zbbr/objectId/9ead5b6a-fc1a-49f4-8151-9cf7cd632a46][0m
+2025-10-23T08:55:42.4904077Z [0m[1mmodule.app_resources[0].module.keyvault[0].azurerm_key_vault_access_policy.current_user: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP/providers/Microsoft.KeyVault/vaults/us1bofawmappkvaa4g88n0/objectId/9ead5b6a-fc1a-49f4-8151-9cf7cd632a46][0m
+2025-10-23T08:55:42.6133610Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.aks_database_outbound[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-LOGI-SUBNET-NSG/securityRules/AllowDatabaseConnectionsOutbound][0m
+2025-10-23T08:55:42.6156486Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_web_to_logi[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-LOGI-SUBNET-NSG/securityRules/AllowWebToLogiServices][0m
+2025-10-23T08:55:42.6425072Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_private_inbound["ADO-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-ADO-SUBNET-NSG/securityRules/AllowPrivateInBound][0m
+2025-10-23T08:55:42.6521592Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_private_inbound["APP-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-APP-SUBNET-NSG/securityRules/AllowPrivateInBound][0m
+2025-10-23T08:55:42.6594679Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_private_inbound["DB-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-DB-SUBNET-NSG/securityRules/AllowPrivateInBound][0m
+2025-10-23T08:55:42.7790249Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_private_inbound["LOGI-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-LOGI-SUBNET-NSG/securityRules/AllowPrivateInBound][0m
+2025-10-23T08:55:42.7899027Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_private_inbound["SFTP-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-SFTP-SUBNET-NSG/securityRules/AllowPrivateInBound][0m
+2025-10-23T08:55:42.8970891Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_private_inbound["WEB-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-WEB-SUBNET-NSG/securityRules/AllowPrivateInBound][0m
+2025-10-23T08:55:42.9155843Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_vnet_inbound["DB-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-DB-SUBNET-NSG/securityRules/AllowVnetInBound][0m
+2025-10-23T08:55:42.9172401Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_app_to_logi[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-LOGI-SUBNET-NSG/securityRules/AllowAppToLogiServices][0m
+2025-10-23T08:55:42.9236020Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_vnet_inbound["LOGI-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-LOGI-SUBNET-NSG/securityRules/AllowVnetInBound][0m
+2025-10-23T08:55:42.9305529Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_vnet_inbound["SFTP-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-SFTP-SUBNET-NSG/securityRules/AllowVnetInBound][0m
+2025-10-23T08:55:42.9468610Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_vnet_inbound["WEB-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-WEB-SUBNET-NSG/securityRules/AllowVnetInBound][0m
+2025-10-23T08:55:42.9536342Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_vnet_inbound["ADO-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-ADO-SUBNET-NSG/securityRules/AllowVnetInBound][0m
+2025-10-23T08:55:43.0235227Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_vnet_inbound["APP-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-APP-SUBNET-NSG/securityRules/AllowVnetInBound][0m
+2025-10-23T08:55:43.0340854Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.aks_kubelet_inbound[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-LOGI-SUBNET-NSG/securityRules/AllowKubeletInbound][0m
+2025-10-23T08:55:43.0832742Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.aks_api_server_inbound[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-LOGI-SUBNET-NSG/securityRules/AllowAKSApiServerInbound][0m
+2025-10-23T08:55:43.1411638Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.appgw_allow_azureloadbalancer[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-AG-SUBNET-NSG/securityRules/AllowAzureLoadBalancerInbound][0m
+2025-10-23T08:55:43.1422658Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.logi_ingress_from_vpn[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-LOGI-SUBNET-NSG/securityRules/AllowLogiIngressFromVPN][0m
+2025-10-23T08:55:43.1694276Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.appgw_allow_gateway_manager[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-AG-SUBNET-NSG/securityRules/AllowGatewayManagerInbound][0m
+2025-10-23T08:55:43.1695673Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_all_outbound["APP-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-APP-SUBNET-NSG/securityRules/AllowAllOutBound][0m
+2025-10-23T08:55:43.1716859Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_all_outbound["DB-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-DB-SUBNET-NSG/securityRules/AllowAllOutBound][0m
+2025-10-23T08:55:43.2021814Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_all_outbound["LOGI-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-LOGI-SUBNET-NSG/securityRules/AllowAllOutBound][0m
+2025-10-23T08:55:43.3121333Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_all_outbound["SFTP-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-SFTP-SUBNET-NSG/securityRules/AllowAllOutBound][0m
+2025-10-23T08:55:43.3463041Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_all_outbound["WEB-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-WEB-SUBNET-NSG/securityRules/AllowAllOutBound][0m
+2025-10-23T08:55:43.3564706Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_all_outbound["ADO-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-ADO-SUBNET-NSG/securityRules/AllowAllOutBound][0m
+2025-10-23T08:55:43.3631697Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_logi_to_db_outbound[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-LOGI-SUBNET-NSG/securityRules/AllowLogiToDbOutbound][0m
+2025-10-23T08:55:43.3712314Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.allow_logi_to_db_inbound[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-DB-SUBNET-NSG/securityRules/AllowLogiToDbInbound][0m
+2025-10-23T08:55:43.4157167Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_network_security_rule.appgw_allow_internet_inbound[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-SPOKE-AG-SUBNET-NSG/securityRules/AllowInternetInbound][0m
+2025-10-23T08:55:43.4195866Z [0m[1mmodule.spoke_vnet.module.networking[0].module.vnet.azurerm_subnet.subnet_for_each["US1-BOFA-WM-SPOKE-LOGI-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-LOGI-SUBNET][0m
+2025-10-23T08:55:43.4868110Z [0m[1mmodule.spoke_vnet.module.networking[0].module.vnet.azurerm_subnet.subnet_for_each["US1-BOFA-WM-SPOKE-SFTP-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-SFTP-SUBNET][0m
+2025-10-23T08:55:43.5115184Z [0m[1mmodule.spoke_vnet.module.networking[0].module.vnet.azurerm_subnet.subnet_for_each["US1-BOFA-WM-SPOKE-APP-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-APP-SUBNET][0m
+2025-10-23T08:55:43.5165662Z [0m[1mmodule.spoke_vnet.module.networking[0].module.vnet.azurerm_subnet.subnet_for_each["US1-BOFA-WM-SPOKE-DB-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-DB-SUBNET][0m
+2025-10-23T08:55:43.5462698Z [0m[1mmodule.spoke_vnet.module.networking[0].module.vnet.azurerm_subnet.subnet_for_each["US1-BOFA-WM-SPOKE-WEB-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-WEB-SUBNET][0m
+2025-10-23T08:55:43.5772024Z [0m[1mmodule.spoke_vnet.module.networking[0].module.vnet.azurerm_subnet.subnet_for_each["US1-BOFA-WM-SPOKE-ADO-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-ADO-SUBNET][0m
+2025-10-23T08:55:43.5971556Z [0m[1mmodule.spoke_vnet.module.networking[0].module.vnet.azurerm_subnet.subnet_for_each["US1-BOFA-WM-SPOKE-AG-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-AG-SUBNET][0m
+2025-10-23T08:55:43.6154264Z [0m[1mmodule.app_resources[0].module.scripts_storage[0].azurerm_storage_container.scripts_container: Refreshing state... [id=https://us1bofawmappscripts.blob.core.windows.net/powershell-scripts][0m
+2025-10-23T08:55:43.6413561Z [0m[1mmodule.web_resources[0].azurerm_key_vault_access_policy.appgw[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.KeyVault/vaults/us1bofawmwebkv1f2t0irq/objectId/23215009-772f-4abc-8cb5-3e8bbb8e6dc8][0m
+2025-10-23T08:55:43.7038243Z [0m[1mmodule.ado_resources[0].module.scripts_storage[0].azurerm_storage_container.scripts_container: Refreshing state... [id=https://us1bofawmadoscripts.blob.core.windows.net/powershell-scripts][0m
+2025-10-23T08:55:43.7841085Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_subnet_network_security_group_association.subnet_nsg_association["APP-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-APP-SUBNET][0m
+2025-10-23T08:55:43.7847863Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_subnet_network_security_group_association.subnet_nsg_association["AG-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-AG-SUBNET][0m
+2025-10-23T08:55:43.7850814Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_subnet_network_security_group_association.subnet_nsg_association["DB-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-DB-SUBNET][0m
+2025-10-23T08:55:43.7852287Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_subnet_network_security_group_association.subnet_nsg_association["ADO-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-ADO-SUBNET][0m
+2025-10-23T08:55:43.7853297Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_subnet_network_security_group_association.subnet_nsg_association["WEB-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-WEB-SUBNET][0m
+2025-10-23T08:55:43.7854291Z [0m[1mmodule.spoke_vnet.module.networking[0].azurerm_subnet_network_security_group_association.subnet_nsg_association["SFTP-SUBNET"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-SFTP-SUBNET][0m
+2025-10-23T08:55:43.8274628Z [0m[1mmodule.app_resources[0].module.scripts_storage[0].azurerm_storage_blob.oracle_client_install: Refreshing state... [id=https://us1bofawmappscripts.blob.core.windows.net/powershell-scripts/Oracle_client_install.ps1][0m
+2025-10-23T08:55:43.8325727Z [0m[1mmodule.app_resources[0].module.scripts_storage[0].azurerm_storage_blob.datadog_gpg_install: Refreshing state... [id=https://us1bofawmappscripts.blob.core.windows.net/powershell-scripts/Datadog_GPG_install.ps1][0m
+2025-10-23T08:55:43.8467442Z [0m[1mmodule.app_resources[0].module.scripts_storage[0].azurerm_storage_blob.web_server_roles: Refreshing state... [id=https://us1bofawmappscripts.blob.core.windows.net/powershell-scripts/web-server-roles.ps1][0m
+2025-10-23T08:55:43.8512889Z [0m[1mmodule.app_resources[0].module.scripts_storage[0].azurerm_storage_blob.provisioning_disks_app: Refreshing state... [id=https://us1bofawmappscripts.blob.core.windows.net/powershell-scripts/Provisioning_disks_APP.ps1][0m
+2025-10-23T08:55:43.8579380Z [0m[1mmodule.app_resources[0].module.scripts_storage[0].azurerm_storage_blob.gmsa_configuration: Refreshing state... [id=https://us1bofawmappscripts.blob.core.windows.net/powershell-scripts/gMSA_configuration.ps1][0m
+2025-10-23T08:55:43.9145619Z [0m[1mmodule.app_resources[0].module.scripts_storage[0].azurerm_storage_blob.bofa_domain_join: Refreshing state... [id=https://us1bofawmappscripts.blob.core.windows.net/powershell-scripts/BOFA_domain_join.ps1][0m
+2025-10-23T08:55:43.9309380Z [0m[1mmodule.app_resources[0].module.scripts_storage[0].azurerm_storage_blob.provisioning_disks_web: Refreshing state... [id=https://us1bofawmappscripts.blob.core.windows.net/powershell-scripts/Provisioning_disks_WEB.ps1][0m
+2025-10-23T08:55:43.9702410Z [0m[1mmodule.app_resources[0].module.scripts_storage[0].azurerm_storage_blob.tanium_install_script: Refreshing state... [id=https://us1bofawmappscripts.blob.core.windows.net/powershell-scripts/Tanium_install_script.ps1][0m
+2025-10-23T08:55:43.9933140Z [0m[1mmodule.app_resources[0].module.scripts_storage[0].azurerm_storage_blob.bofa_master_deploy: Refreshing state... [id=https://us1bofawmappscripts.blob.core.windows.net/powershell-scripts/BOFA_Master_Deploy.ps1][0m
+2025-10-23T08:55:44.0223586Z [0m[1mmodule.app_resources[0].module.scripts_storage[0].azurerm_storage_blob.sentinelone_install: Refreshing state... [id=https://us1bofawmappscripts.blob.core.windows.net/powershell-scripts/SentinelOne_install.ps1][0m
+2025-10-23T08:55:44.0604989Z [0m[1mmodule.app_resources[0].module.scripts_storage[0].azurerm_storage_blob.configure_vm: Refreshing state... [id=https://us1bofawmappscripts.blob.core.windows.net/powershell-scripts/configure-vm.ps1][0m
+2025-10-23T08:55:44.0996358Z [0m[1mmodule.ado_resources[0].module.scripts_storage[0].azurerm_storage_blob.provisioning_disks_app: Refreshing state... [id=https://us1bofawmadoscripts.blob.core.windows.net/powershell-scripts/Provisioning_disks_APP.ps1][0m
+2025-10-23T08:55:44.1011959Z [0m[1mmodule.app_resources[0].module.scripts_storage[0].azurerm_storage_blob.app_server_roles: Refreshing state... [id=https://us1bofawmappscripts.blob.core.windows.net/powershell-scripts/app-server-roles.ps1][0m
+2025-10-23T08:55:44.1125019Z [0m[1mmodule.ado_resources[0].module.scripts_storage[0].azurerm_storage_blob.datadog_gpg_install: Refreshing state... [id=https://us1bofawmadoscripts.blob.core.windows.net/powershell-scripts/Datadog_GPG_install.ps1][0m
+2025-10-23T08:55:44.1172627Z [0m[1mmodule.ado_resources[0].module.scripts_storage[0].azurerm_storage_blob.sentinelone_install: Refreshing state... [id=https://us1bofawmadoscripts.blob.core.windows.net/powershell-scripts/SentinelOne_install.ps1][0m
+2025-10-23T08:55:44.1189435Z [0m[1mmodule.ado_resources[0].module.scripts_storage[0].azurerm_storage_blob.bofa_master_deploy: Refreshing state... [id=https://us1bofawmadoscripts.blob.core.windows.net/powershell-scripts/BOFA_Master_Deploy.ps1][0m
+2025-10-23T08:55:44.1199703Z [0m[1mmodule.ado_resources[0].module.scripts_storage[0].azurerm_storage_blob.gmsa_configuration: Refreshing state... [id=https://us1bofawmadoscripts.blob.core.windows.net/powershell-scripts/gMSA_configuration.ps1][0m
+2025-10-23T08:55:44.1213455Z [0m[1mmodule.ado_resources[0].module.scripts_storage[0].azurerm_storage_blob.configure_vm: Refreshing state... [id=https://us1bofawmadoscripts.blob.core.windows.net/powershell-scripts/configure-vm.ps1][0m
+2025-10-23T08:55:44.1272081Z [0m[1mmodule.ado_resources[0].module.scripts_storage[0].azurerm_storage_blob.provisioning_disks_web: Refreshing state... [id=https://us1bofawmadoscripts.blob.core.windows.net/powershell-scripts/Provisioning_disks_WEB.ps1][0m
+2025-10-23T08:55:44.1381449Z [0m[1mmodule.ado_resources[0].module.scripts_storage[0].azurerm_storage_blob.app_server_roles: Refreshing state... [id=https://us1bofawmadoscripts.blob.core.windows.net/powershell-scripts/app-server-roles.ps1][0m
+2025-10-23T08:55:44.1461663Z [0m[1mmodule.ado_resources[0].module.scripts_storage[0].azurerm_storage_blob.bofa_domain_join: Refreshing state... [id=https://us1bofawmadoscripts.blob.core.windows.net/powershell-scripts/BOFA_domain_join.ps1][0m
+2025-10-23T08:55:44.1502119Z [0m[1mmodule.ado_resources[0].module.scripts_storage[0].azurerm_storage_blob.web_server_roles: Refreshing state... [id=https://us1bofawmadoscripts.blob.core.windows.net/powershell-scripts/web-server-roles.ps1][0m
+2025-10-23T08:55:44.1543849Z [0m[1mmodule.ado_resources[0].module.scripts_storage[0].azurerm_storage_blob.tanium_install_script: Refreshing state... [id=https://us1bofawmadoscripts.blob.core.windows.net/powershell-scripts/Tanium_install_script.ps1][0m
+2025-10-23T08:55:44.1902321Z [0m[1mmodule.web_resources[0].module.scripts_storage[0].azurerm_storage_container.scripts_container: Refreshing state... [id=https://us1bofawmwebscripts.blob.core.windows.net/powershell-scripts][0m
+2025-10-23T08:55:44.2040533Z [0m[1mmodule.ado_resources[0].module.scripts_storage[0].azurerm_storage_blob.oracle_client_install: Refreshing state... [id=https://us1bofawmadoscripts.blob.core.windows.net/powershell-scripts/Oracle_client_install.ps1][0m
+2025-10-23T08:55:44.2129222Z [0m[1mmodule.app_resources[0].module.compute["US1-BOFA-WM-APP-VM01"].random_password.vm_password: Refreshing state... [id=none][0m
+2025-10-23T08:55:44.2182067Z [0m[1mmodule.web_resources[0].module.application_gateway[0].azurerm_public_ip.appgw_pip: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/publicIPAddresses/US1-BOFA-WM-WEB-AGW-PIP][0m
+2025-10-23T08:55:44.2228706Z [0m[1mmodule.spoke_vnet.module.vnet_peering[0].azurerm_virtual_network_peering.aadds_to_local: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-P-DS/providers/Microsoft.Network/virtualNetworks/US1-BOFA-P-DS-VNET/virtualNetworkPeerings/US1-BOFA-P-DS-VNET-to-US1-BOFA-WM-SPOKE-VNET][0m
+2025-10-23T08:55:44.2265109Z [0m[1mmodule.spoke_vnet.module.nat_gateway[0].azurerm_nat_gateway.nat_gateway: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/natGateways/US1-BOFA-WM-SPOKE-NAT-GW][0m
+2025-10-23T08:55:44.2371796Z [0m[1mmodule.spoke_vnet.module.nat_gateway[0].azurerm_public_ip.nat_gateway_pip: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/publicIPAddresses/US1-BOFA-WM-SPOKE-NAT-GW-PIP][0m
+2025-10-23T08:55:44.2451539Z [0m[1mmodule.app_resources[0].module.compute["US1-BOFA-WM-APP-VM01"].azurerm_managed_disk.data_disks[1]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP/providers/Microsoft.Compute/disks/US1-BOFA-WM-APP-VM01-DataDisk-2][0m
+2025-10-23T08:55:44.2535104Z [0m[1mmodule.app_resources[0].module.compute["US1-BOFA-WM-APP-VM01"].azurerm_managed_disk.data_disks[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP/providers/Microsoft.Compute/disks/US1-BOFA-WM-APP-VM01-DataDisk-1][0m
+2025-10-23T08:55:44.2548428Z [0m[1mmodule.app_resources[0].module.compute["US1-BOFA-WM-APP-VM01"].azurerm_network_security_group.vm_nsg: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-APP-VM01-NSG][0m
+2025-10-23T08:55:44.2578752Z [0m[1mmodule.spoke_vnet.module.vnet_peering[0].azurerm_virtual_network_peering.local_to_aadds: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/virtualNetworkPeerings/US1-BOFA-WM-SPOKE-VNET-to-US1-BOFA-P-DS-VNET][0m
+2025-10-23T08:55:44.2735127Z [0m[1mmodule.app_resources[0].module.compute["US1-BOFA-WM-APP-VM01"].azurerm_network_interface.vm_nic: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP/providers/Microsoft.Network/networkInterfaces/US1-BOFA-WM-APP-VM01-NIC][0m
+2025-10-23T08:55:44.2837168Z [0m[1mmodule.app_resources[0].module.compute["US1-BOFA-WM-APP-VM01"].azurerm_key_vault_secret.vm_password: Refreshing state... [id=https://us1bofawmappkvaa4g88n0.vault.azure.net/secrets/US1-BOFA-WM-APP-VM01-admin-password/a78a433e4d9d4f4e9b44c9b0d7081803][0m
+2025-10-23T08:55:44.3129351Z [0m[1mmodule.web_resources[0].module.scripts_storage[0].azurerm_storage_blob.configure_vm: Refreshing state... [id=https://us1bofawmwebscripts.blob.core.windows.net/powershell-scripts/configure-vm.ps1][0m
+2025-10-23T08:55:44.3328944Z [0m[1mmodule.web_resources[0].module.scripts_storage[0].azurerm_storage_blob.datadog_gpg_install: Refreshing state... [id=https://us1bofawmwebscripts.blob.core.windows.net/powershell-scripts/Datadog_GPG_install.ps1][0m
+2025-10-23T08:55:44.3412112Z [0m[1mmodule.web_resources[0].module.scripts_storage[0].azurerm_storage_blob.provisioning_disks_app: Refreshing state... [id=https://us1bofawmwebscripts.blob.core.windows.net/powershell-scripts/Provisioning_disks_APP.ps1][0m
+2025-10-23T08:55:44.3607787Z [0m[1mmodule.web_resources[0].module.scripts_storage[0].azurerm_storage_blob.tanium_install_script: Refreshing state... [id=https://us1bofawmwebscripts.blob.core.windows.net/powershell-scripts/Tanium_install_script.ps1][0m
+2025-10-23T08:55:44.3732322Z [0m[1mmodule.web_resources[0].module.scripts_storage[0].azurerm_storage_blob.bofa_master_deploy: Refreshing state... [id=https://us1bofawmwebscripts.blob.core.windows.net/powershell-scripts/BOFA_Master_Deploy.ps1][0m
+2025-10-23T08:55:44.4047378Z [0m[1mmodule.web_resources[0].module.scripts_storage[0].azurerm_storage_blob.provisioning_disks_web: Refreshing state... [id=https://us1bofawmwebscripts.blob.core.windows.net/powershell-scripts/Provisioning_disks_WEB.ps1][0m
+2025-10-23T08:55:44.4049149Z [0m[1mmodule.web_resources[0].module.scripts_storage[0].azurerm_storage_blob.app_server_roles: Refreshing state... [id=https://us1bofawmwebscripts.blob.core.windows.net/powershell-scripts/app-server-roles.ps1][0m
+2025-10-23T08:55:44.4175874Z [0m[1mmodule.web_resources[0].module.scripts_storage[0].azurerm_storage_blob.sentinelone_install: Refreshing state... [id=https://us1bofawmwebscripts.blob.core.windows.net/powershell-scripts/SentinelOne_install.ps1][0m
+2025-10-23T08:55:44.4216262Z [0m[1mmodule.web_resources[0].module.scripts_storage[0].azurerm_storage_blob.gmsa_configuration: Refreshing state... [id=https://us1bofawmwebscripts.blob.core.windows.net/powershell-scripts/gMSA_configuration.ps1][0m
+2025-10-23T08:55:44.4448605Z [0m[1mmodule.web_resources[0].module.scripts_storage[0].azurerm_storage_blob.oracle_client_install: Refreshing state... [id=https://us1bofawmwebscripts.blob.core.windows.net/powershell-scripts/Oracle_client_install.ps1][0m
+2025-10-23T08:55:44.4592635Z [0m[1mmodule.web_resources[0].module.scripts_storage[0].azurerm_storage_blob.web_server_roles: Refreshing state... [id=https://us1bofawmwebscripts.blob.core.windows.net/powershell-scripts/web-server-roles.ps1][0m
+2025-10-23T08:55:44.4619718Z [0m[1mmodule.spoke_vnet.module.nat_gateway[0].azurerm_subnet_nat_gateway_association.subnet_association["1"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-APP-SUBNET][0m
+2025-10-23T08:55:44.4642992Z [0m[1mmodule.spoke_vnet.module.nat_gateway[0].azurerm_subnet_nat_gateway_association.subnet_association["0"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-WEB-SUBNET][0m
+2025-10-23T08:55:44.4698459Z [0m[1mmodule.web_resources[0].module.scripts_storage[0].azurerm_storage_blob.bofa_domain_join: Refreshing state... [id=https://us1bofawmwebscripts.blob.core.windows.net/powershell-scripts/BOFA_domain_join.ps1][0m
+2025-10-23T08:55:44.4710759Z [0m[1mmodule.spoke_vnet.module.nat_gateway[0].azurerm_subnet_nat_gateway_association.subnet_association["2"]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-ADO-SUBNET][0m
+2025-10-23T08:55:44.4863973Z [0m[1mmodule.ado_resources[0].module.compute["US1-BOFA-WM-ADO-VM01"].random_password.vm_password: Refreshing state... [id=none][0m
+2025-10-23T08:55:44.5003336Z [0m[1mmodule.spoke_vnet.module.nat_gateway[0].azurerm_nat_gateway_public_ip_association.nat_gateway_pip_association: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/natGateways/US1-BOFA-WM-SPOKE-NAT-GW|/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/publicIPAddresses/US1-BOFA-WM-SPOKE-NAT-GW-PIP][0m
+2025-10-23T08:55:44.5545196Z [0m[1mmodule.ado_resources[0].module.compute["US1-BOFA-WM-ADO-VM01"].azurerm_network_security_group.vm_nsg: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-ADO-VM01-NSG][0m
+2025-10-23T08:55:44.5642950Z [0m[1mmodule.ado_resources[0].module.compute["US1-BOFA-WM-ADO-VM01"].azurerm_managed_disk.data_disks[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO/providers/Microsoft.Compute/disks/US1-BOFA-WM-ADO-VM01-DataDisk-1][0m
+2025-10-23T08:55:44.5645542Z [0m[1mmodule.ado_resources[0].module.compute["US1-BOFA-WM-ADO-VM01"].azurerm_managed_disk.data_disks[1]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO/providers/Microsoft.Compute/disks/US1-BOFA-WM-ADO-VM01-DataDisk-2][0m
+2025-10-23T08:55:44.5742548Z [0m[1mmodule.ado_resources[0].module.compute["US1-BOFA-WM-ADO-VM01"].azurerm_network_interface.vm_nic: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO/providers/Microsoft.Network/networkInterfaces/US1-BOFA-WM-ADO-VM01-NIC][0m
+2025-10-23T08:55:44.6002933Z [0m[1mmodule.ado_resources[0].module.compute["US1-BOFA-WM-ADO-VM01"].azurerm_key_vault_secret.vm_password: Refreshing state... [id=https://us1bofawmadokv0eorhslk.vault.azure.net/secrets/US1-BOFA-WM-ADO-VM01-admin-password/fcf942e0583b413c95a0b89b3d803ac9][0m
+2025-10-23T08:55:44.6114232Z [0m[1mmodule.app_resources[0].module.compute["US1-BOFA-WM-APP-VM01"].azurerm_network_interface_security_group_association.vm_nsg_association: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP/providers/Microsoft.Network/networkInterfaces/US1-BOFA-WM-APP-VM01-NIC|/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-APP-VM01-NSG][0m
+2025-10-23T08:55:44.6392478Z [0m[1mmodule.web_resources[0].module.compute["US1-BOFA-WM-WEB-VM01"].random_password.vm_password: Refreshing state... [id=none][0m
+2025-10-23T08:55:44.6455334Z [0m[1mmodule.web_resources[0].module.compute["US1-BOFA-WM-WEB-VM01"].azurerm_managed_disk.data_disks[1]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Compute/disks/US1-BOFA-WM-WEB-VM01-DataDisk-2][0m
+2025-10-23T08:55:44.6601642Z [0m[1mmodule.web_resources[0].module.compute["US1-BOFA-WM-WEB-VM01"].azurerm_managed_disk.data_disks[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Compute/disks/US1-BOFA-WM-WEB-VM01-DataDisk-1][0m
+2025-10-23T08:55:44.6950658Z [0m[1mmodule.web_resources[0].module.compute["US1-BOFA-WM-WEB-VM01"].azurerm_network_interface.vm_nic: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/networkInterfaces/US1-BOFA-WM-WEB-VM01-NIC][0m
+2025-10-23T08:55:44.7203272Z [0m[1mmodule.web_resources[0].module.compute["US1-BOFA-WM-WEB-VM01"].azurerm_key_vault_secret.vm_password: Refreshing state... [id=https://us1bofawmwebkv1f2t0irq.vault.azure.net/secrets/US1-BOFA-WM-WEB-VM01-admin-password/932fddc37a734a7aac21c2bd36c24f3c][0m
+2025-10-23T08:55:44.7270616Z [0m[1mmodule.app_resources[0].module.compute["US1-BOFA-WM-APP-VM01"].azurerm_windows_virtual_machine.vm: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-APP-VM01][0m
+2025-10-23T08:55:44.7277277Z [0m[1mmodule.web_resources[0].module.compute["US1-BOFA-WM-WEB-VM01"].azurerm_network_security_group.vm_nsg: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-WEB-VM01-NSG][0m
+2025-10-23T08:55:44.8354787Z [0m[1mazurerm_virtual_network_peering.hub_to_spoke: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-CS-HUB/providers/Microsoft.Network/virtualNetworks/US1-BOFA-CS-HUB-VNET/virtualNetworkPeerings/CS-HUB-TO-BOFA-SPOKE][0m
+2025-10-23T08:55:44.8861767Z [0m[1mmodule.db_resources_02[0].azapi_resource.data_disks_from_restore_point[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/disks/US1-BOFA-WM-DB-VM02-DataDisk-1][0m
+2025-10-23T08:55:44.8863097Z [0m[1mmodule.db_resources_02[0].azurerm_network_interface.oracle_nic: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Network/networkInterfaces/US1-BOFA-WM-DB-VM02-NIC][0m
+2025-10-23T08:55:44.8890228Z [0m[1mazurerm_virtual_network_peering.spoke_to_hub: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/virtualNetworkPeerings/US1-BOFA-WM-SPOKE-TO-HUB-PEERING][0m
+2025-10-23T08:55:44.8915239Z [0m[1mmodule.db_resources_02[0].azapi_resource.data_disks_from_restore_point[1]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/disks/US1-BOFA-WM-DB-VM02-DataDisk-2][0m
+2025-10-23T08:55:44.8933487Z [0m[1mmodule.db_resources_02[0].azapi_resource.data_disks_from_restore_point[2]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/disks/US1-BOFA-WM-DB-VM02-DataDisk-3][0m
+2025-10-23T08:55:44.9202883Z [0m[1mmodule.db_resources_02[0].azurerm_network_security_group.oracle_nsg[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-DB-NSG-US1-BOFA-WM-DB-VM02][0m
+2025-10-23T08:55:44.9854264Z [0m[1mmodule.db_resources_02[0].azurerm_key_vault_secret.db_admin_password: Refreshing state... [id=https://us1bofawmdbkvpv17zbbr.vault.azure.net/secrets/US1-BOFA-WM-DB-VM02-admin-password/2f3c190eb0c4406ea9a34a5dc12bb310][0m
+2025-10-23T08:55:45.0063306Z [0m[1mmodule.ado_resources[0].module.compute["US1-BOFA-WM-ADO-VM01"].azurerm_network_interface_security_group_association.vm_nsg_association: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO/providers/Microsoft.Network/networkInterfaces/US1-BOFA-WM-ADO-VM01-NIC|/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-ADO-VM01-NSG][0m
+2025-10-23T08:55:45.0454115Z [0m[1mmodule.sftp[0].azurerm_private_dns_zone.blob[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SFTP/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net][0m
+2025-10-23T08:55:45.0717957Z [0m[1mmodule.sftp[0].azurerm_public_ip.natgw_pip[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SFTP/providers/Microsoft.Network/publicIPAddresses/US1-BOFA-WM-SFTP-NATGWPIP01][0m
+2025-10-23T08:55:45.0793900Z [0m[1mmodule.sftp[0].azurerm_storage_account.main[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SFTP/providers/Microsoft.Storage/storageAccounts/us1bofawmsftpng][0m
+2025-10-23T08:55:45.1080685Z [0m[1mmodule.sftp[0].azurerm_nat_gateway.natgw[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SFTP/providers/Microsoft.Network/natGateways/US1-BOFA-WM-SFTP-NATGW01][0m
+2025-10-23T08:55:45.1455462Z [0m[1mmodule.web_resources[0].module.compute["US1-BOFA-WM-WEB-VM01"].azurerm_network_interface_security_group_association.vm_nsg_association: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/networkInterfaces/US1-BOFA-WM-WEB-VM01-NIC|/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-WEB-VM01-NSG][0m
+2025-10-23T08:55:45.1819289Z [0m[1mmodule.db_resources_02[0].azapi_resource.os_disk_from_restore_point[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/disks/US1-BOFA-WM-DB-VM02-OsDisk][0m
+2025-10-23T08:55:45.1914613Z [0m[1mmodule.db_resources_02[0].azurerm_key_vault_secret.db_connection_string: Refreshing state... [id=https://us1bofawmdbkvpv17zbbr.vault.azure.net/secrets/US1-BOFA-WM-DB-VM02-connection-string/39bcaf909d12445d8af7d1f956267de1][0m
+2025-10-23T08:55:45.2084167Z [0m[1mmodule.db_resources_02[0].azurerm_network_security_rule.oracle_enterprise_manager[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-DB-NSG-US1-BOFA-WM-DB-VM02/securityRules/Allow-Oracle-EM][0m
+2025-10-23T08:55:45.2269698Z [0m[1mmodule.db_resources_02[0].azurerm_network_security_rule.smb[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-DB-NSG-US1-BOFA-WM-DB-VM02/securityRules/Allow-SMB][0m
+2025-10-23T08:55:45.2434209Z [0m[1mmodule.db_resources_02[0].azurerm_network_security_rule.oracle_listener[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-DB-NSG-US1-BOFA-WM-DB-VM02/securityRules/Allow-Oracle-Listener][0m
+2025-10-23T08:55:45.2565148Z [0m[1mmodule.db_resources_02[0].azurerm_network_security_rule.oracle_sqlnet[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-DB-NSG-US1-BOFA-WM-DB-VM02/securityRules/Allow-Oracle-SQLNet][0m
+2025-10-23T08:55:45.2862689Z [0m[1mmodule.db_resources_02[0].azurerm_network_interface_security_group_association.oracle_nic_nsg: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Network/networkInterfaces/US1-BOFA-WM-DB-VM02-NIC|/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Network/networkSecurityGroups/US1-BOFA-WM-DB-NSG-US1-BOFA-WM-DB-VM02][0m
+2025-10-23T08:55:45.2905354Z [0m[1mmodule.ado_resources[0].module.compute["US1-BOFA-WM-ADO-VM01"].azurerm_windows_virtual_machine.vm: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-ADO-VM01][0m
+2025-10-23T08:55:45.3263970Z [0m[1mmodule.web_resources[0].module.compute["US1-BOFA-WM-WEB-VM01"].azurerm_windows_virtual_machine.vm: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-WEB-VM01][0m
+2025-10-23T08:55:45.3806410Z [0m[1mmodule.sftp[0].azurerm_nat_gateway_public_ip_association.natgw_pip_assoc[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SFTP/providers/Microsoft.Network/natGateways/US1-BOFA-WM-SFTP-NATGW01|/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SFTP/providers/Microsoft.Network/publicIPAddresses/US1-BOFA-WM-SFTP-NATGWPIP01][0m
+2025-10-23T08:55:45.4309529Z [0m[1mmodule.sftp[0].azurerm_subnet_nat_gateway_association.natgw_subnet_assoc[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-SFTP-SUBNET][0m
+2025-10-23T08:55:45.4744895Z [0m[1mmodule.app_resources[0].module.compute["US1-BOFA-WM-APP-VM01"].azurerm_virtual_machine_data_disk_attachment.data_disk_attachments[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-APP-VM01/dataDisks/US1-BOFA-WM-APP-VM01-DataDisk-1][0m
+2025-10-23T08:55:45.4758617Z [0m[1mmodule.app_resources[0].module.compute["US1-BOFA-WM-APP-VM01"].azurerm_virtual_machine_data_disk_attachment.data_disk_attachments[1]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-APP-VM01/dataDisks/US1-BOFA-WM-APP-VM01-DataDisk-2][0m
+2025-10-23T08:55:45.4890014Z [0m[1mmodule.sftp[0].azurerm_private_dns_zone_virtual_network_link.blob_vnet_link[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SFTP/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net/virtualNetworkLinks/US1-BOFA-WM-SPOKE-VNET-blob-dns-link][0m
+2025-10-23T08:55:45.7473861Z [0m[1mmodule.app_resources[0].module.compute["US1-BOFA-WM-APP-VM01"].azurerm_virtual_machine_extension.bofa_vm_configuration[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-APP-VM01/extensions/US1-BOFA-WM-APP-VM01-BOFA-Configuration-Extension][0m
+2025-10-23T08:55:45.7984612Z [0m[1mmodule.db_resources_02[0].azapi_resource.vm_from_restore_point[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-DB-VM02][0m
+2025-10-23T08:55:45.8578292Z [0m[1mmodule.web_resources[0].module.compute["US1-BOFA-WM-WEB-VM01"].azurerm_virtual_machine_data_disk_attachment.data_disk_attachments[1]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-WEB-VM01/dataDisks/US1-BOFA-WM-WEB-VM01-DataDisk-2][0m
+2025-10-23T08:55:45.8580657Z [0m[1mmodule.web_resources[0].module.compute["US1-BOFA-WM-WEB-VM01"].azurerm_virtual_machine_data_disk_attachment.data_disk_attachments[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-WEB-VM01/dataDisks/US1-BOFA-WM-WEB-VM01-DataDisk-1][0m
+2025-10-23T08:55:45.9338242Z [0m[1mmodule.db_resources_02[0].azurerm_virtual_machine_data_disk_attachment.oracle_data_disk_attachment_restore[2]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-DB-VM02/dataDisks/US1-BOFA-WM-DB-VM02-DataDisk-3][0m
+2025-10-23T08:55:45.9339754Z [0m[1mmodule.db_resources_02[0].azurerm_virtual_machine_data_disk_attachment.oracle_data_disk_attachment_restore[1]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-DB-VM02/dataDisks/US1-BOFA-WM-DB-VM02-DataDisk-2][0m
+2025-10-23T08:55:45.9361985Z [0m[1mmodule.db_resources_02[0].azurerm_virtual_machine_data_disk_attachment.oracle_data_disk_attachment_restore[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-DB-VM02/dataDisks/US1-BOFA-WM-DB-VM02-DataDisk-1][0m
+2025-10-23T08:55:46.0756288Z [0m[1mmodule.sftp[0].azurerm_storage_container.containers["uploads"]: Refreshing state... [id=https://us1bofawmsftpng.blob.core.windows.net/uploads][0m
+2025-10-23T08:55:46.0778576Z [0m[1mmodule.sftp[0].azurerm_storage_container.containers["downloads"]: Refreshing state... [id=https://us1bofawmsftpng.blob.core.windows.net/downloads][0m
+2025-10-23T08:55:46.0780691Z [0m[1mmodule.sftp[0].azurerm_storage_container.containers["archive"]: Refreshing state... [id=https://us1bofawmsftpng.blob.core.windows.net/archive][0m
+2025-10-23T08:55:46.0783191Z [0m[1mmodule.sftp[0].azurerm_private_endpoint.sftp_pe[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SFTP/providers/Microsoft.Network/privateEndpoints/us1bofawmsftp-blob-pe][0m
+2025-10-23T08:55:46.1151650Z [0m[1mmodule.ado_resources[0].module.compute["US1-BOFA-WM-ADO-VM01"].azurerm_virtual_machine_data_disk_attachment.data_disk_attachments[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-ADO-VM01/dataDisks/US1-BOFA-WM-ADO-VM01-DataDisk-1][0m
+2025-10-23T08:55:46.1327505Z [0m[1mmodule.ado_resources[0].module.compute["US1-BOFA-WM-ADO-VM01"].azurerm_virtual_machine_data_disk_attachment.data_disk_attachments[1]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-ADO-VM01/dataDisks/US1-BOFA-WM-ADO-VM01-DataDisk-2][0m
+2025-10-23T08:55:46.1526500Z [0m[1mmodule.web_resources[0].module.compute["US1-BOFA-WM-WEB-VM01"].azurerm_virtual_machine_extension.bofa_vm_configuration[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-WEB-VM01/extensions/US1-BOFA-WM-WEB-VM01-BOFA-Configuration-Extension][0m
+2025-10-23T08:55:46.3544122Z [0m[1mmodule.ado_resources[0].module.compute["US1-BOFA-WM-ADO-VM01"].azurerm_virtual_machine_extension.bofa_vm_configuration[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-ADO-VM01/extensions/US1-BOFA-WM-ADO-VM01-BOFA-Configuration-Extension][0m
+2025-10-23T08:55:46.5916654Z [0m[1mmodule.web_resources[0].module.application_gateway[0].azurerm_application_gateway.appgw: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW][0m
+2025-10-23T08:55:46.6101779Z [0m[1mmodule.sftp[0].azurerm_private_dns_a_record.sftp_pe_dns[0]: Refreshing state... [id=/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SFTP/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net/A/us1bofawmsftpng][0m
+2025-10-23T08:55:47.9701971Z 
+2025-10-23T08:55:47.9703548Z Terraform used the selected providers to generate the following execution
+2025-10-23T08:55:47.9703823Z plan. Resource actions are indicated with the following symbols:
+2025-10-23T08:55:47.9704320Z   [33m~[0m update in-place[0m
+2025-10-23T08:55:47.9704572Z [31m-[0m/[32m+[0m destroy and then create replacement[0m
+2025-10-23T08:55:47.9704819Z  [36m<=[0m read (data resources)[0m
+2025-10-23T08:55:47.9704915Z 
+2025-10-23T08:55:47.9705065Z Terraform will perform the following actions:
+2025-10-23T08:55:47.9707121Z 
+2025-10-23T08:55:47.9707826Z [1m  # module.db_resources_02[0].data.azurerm_client_config.current[0m will be read during apply
+2025-10-23T08:55:47.9708472Z   # (depends on a resource or a module with changes pending)
+2025-10-23T08:55:47.9708998Z [0m [36m<=[0m[0m data "azurerm_client_config" "current" {
+2025-10-23T08:55:47.9709272Z       [32m+[0m[0m client_id       = (known after apply)
+2025-10-23T08:55:47.9709529Z       [32m+[0m[0m id              = (known after apply)
+2025-10-23T08:55:47.9709784Z       [32m+[0m[0m object_id       = (known after apply)
+2025-10-23T08:55:47.9710063Z       [32m+[0m[0m subscription_id = (known after apply)
+2025-10-23T08:55:47.9710471Z       [32m+[0m[0m tenant_id       = (known after apply)
+2025-10-23T08:55:47.9710640Z     }
+2025-10-23T08:55:47.9710690Z 
+2025-10-23T08:55:47.9711035Z [1m  # module.db_resources_02[0].azapi_resource.data_disks_from_restore_point[0][0m must be [1m[31mreplaced[0m
+2025-10-23T08:55:47.9711411Z [0m[31m-[0m/[32m+[0m[0m resource "azapi_resource" "data_disks_from_restore_point" {
+2025-10-23T08:55:47.9720488Z       [33m~[0m[0m id                        = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/disks/US1-BOFA-WM-DB-VM02-DataDisk-1" -> (known after apply)
+2025-10-23T08:55:47.9720865Z         name                      = "US1-BOFA-WM-DB-VM02-DataDisk-1"
+2025-10-23T08:55:47.9721201Z       [33m~[0m[0m output                    = jsonencode({}) -> (known after apply)
+2025-10-23T08:55:47.9721698Z       [33m~[0m[0m parent_id                 = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB" -> (known after apply) [31m# forces replacement[0m[0m
+2025-10-23T08:55:47.9722362Z         tags                      = {
+2025-10-23T08:55:47.9722524Z             "Architecture"  = "Shared-Hub-Spoke"
+2025-10-23T08:55:47.9722690Z             "Client"        = "BOFA"
+2025-10-23T08:55:47.9722857Z             "DiskPurpose"   = "DataDisk-1"
+2025-10-23T08:55:47.9723023Z             "Environment"   = "WALMART"
+2025-10-23T08:55:47.9723196Z             "HubSharedWith" = "CS-BOFA"
+2025-10-23T08:55:47.9723354Z             "Instance"      = "DB-VM02"
+2025-10-23T08:55:47.9723498Z             "ManagedBy"     = "Terraform"
+2025-10-23T08:55:47.9723652Z             "Module"        = "db"
+2025-10-23T08:55:47.9723811Z             "Owner"         = "CloudOps-Team"
+2025-10-23T08:55:47.9723969Z             "Project"       = "EM-NextGen"
+2025-10-23T08:55:47.9724137Z             "Purpose"       = "Oracle Database Storage"
+2025-10-23T08:55:47.9724309Z             "Region"        = "US1"
+2025-10-23T08:55:47.9724469Z             "RestoredFrom"  = "DiskRestorePoint"
+2025-10-23T08:55:47.9724677Z             "Role"          = "DatabaseServer"
+2025-10-23T08:55:47.9724821Z             "Tier"          = "Database"
+2025-10-23T08:55:47.9724959Z         }
+2025-10-23T08:55:47.9725344Z         [90m# (7 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9725504Z     }
+2025-10-23T08:55:47.9725552Z 
+2025-10-23T08:55:47.9725894Z [1m  # module.db_resources_02[0].azapi_resource.data_disks_from_restore_point[1][0m must be [1m[31mreplaced[0m
+2025-10-23T08:55:47.9726259Z [0m[31m-[0m/[32m+[0m[0m resource "azapi_resource" "data_disks_from_restore_point" {
+2025-10-23T08:55:47.9726949Z       [33m~[0m[0m id                        = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/disks/US1-BOFA-WM-DB-VM02-DataDisk-2" -> (known after apply)
+2025-10-23T08:55:47.9727252Z         name                      = "US1-BOFA-WM-DB-VM02-DataDisk-2"
+2025-10-23T08:55:47.9727532Z       [33m~[0m[0m output                    = jsonencode({}) -> (known after apply)
+2025-10-23T08:55:47.9728015Z       [33m~[0m[0m parent_id                 = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB" -> (known after apply) [31m# forces replacement[0m[0m
+2025-10-23T08:55:47.9728266Z         tags                      = {
+2025-10-23T08:55:47.9728426Z             "Architecture"  = "Shared-Hub-Spoke"
+2025-10-23T08:55:47.9728589Z             "Client"        = "BOFA"
+2025-10-23T08:55:47.9728750Z             "DiskPurpose"   = "DataDisk-2"
+2025-10-23T08:55:47.9728916Z             "Environment"   = "WALMART"
+2025-10-23T08:55:47.9729078Z             "HubSharedWith" = "CS-BOFA"
+2025-10-23T08:55:47.9729223Z             "Instance"      = "DB-VM02"
+2025-10-23T08:55:47.9729379Z             "ManagedBy"     = "Terraform"
+2025-10-23T08:55:47.9729529Z             "Module"        = "db"
+2025-10-23T08:55:47.9729696Z             "Owner"         = "CloudOps-Team"
+2025-10-23T08:55:47.9729856Z             "Project"       = "EM-NextGen"
+2025-10-23T08:55:47.9730026Z             "Purpose"       = "Oracle Database Storage"
+2025-10-23T08:55:47.9730185Z             "Region"        = "US1"
+2025-10-23T08:55:47.9730474Z             "RestoredFrom"  = "DiskRestorePoint"
+2025-10-23T08:55:47.9730633Z             "Role"          = "DatabaseServer"
+2025-10-23T08:55:47.9730789Z             "Tier"          = "Database"
+2025-10-23T08:55:47.9730926Z         }
+2025-10-23T08:55:47.9731165Z         [90m# (7 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9731316Z     }
+2025-10-23T08:55:47.9731363Z 
+2025-10-23T08:55:47.9731699Z [1m  # module.db_resources_02[0].azapi_resource.data_disks_from_restore_point[2][0m must be [1m[31mreplaced[0m
+2025-10-23T08:55:47.9732064Z [0m[31m-[0m/[32m+[0m[0m resource "azapi_resource" "data_disks_from_restore_point" {
+2025-10-23T08:55:47.9732607Z       [33m~[0m[0m id                        = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/disks/US1-BOFA-WM-DB-VM02-DataDisk-3" -> (known after apply)
+2025-10-23T08:55:47.9736586Z         name                      = "US1-BOFA-WM-DB-VM02-DataDisk-3"
+2025-10-23T08:55:47.9736951Z       [33m~[0m[0m output                    = jsonencode({}) -> (known after apply)
+2025-10-23T08:55:47.9737444Z       [33m~[0m[0m parent_id                 = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB" -> (known after apply) [31m# forces replacement[0m[0m
+2025-10-23T08:55:47.9737693Z         tags                      = {
+2025-10-23T08:55:47.9737854Z             "Architecture"  = "Shared-Hub-Spoke"
+2025-10-23T08:55:47.9738004Z             "Client"        = "BOFA"
+2025-10-23T08:55:47.9738161Z             "DiskPurpose"   = "DataDisk-3"
+2025-10-23T08:55:47.9738323Z             "Environment"   = "WALMART"
+2025-10-23T08:55:47.9738490Z             "HubSharedWith" = "CS-BOFA"
+2025-10-23T08:55:47.9738650Z             "Instance"      = "DB-VM02"
+2025-10-23T08:55:47.9738811Z             "ManagedBy"     = "Terraform"
+2025-10-23T08:55:47.9738962Z             "Module"        = "db"
+2025-10-23T08:55:47.9739102Z             "Owner"         = "CloudOps-Team"
+2025-10-23T08:55:47.9739259Z             "Project"       = "EM-NextGen"
+2025-10-23T08:55:47.9739550Z             "Purpose"       = "Oracle Database Storage"
+2025-10-23T08:55:47.9739714Z             "Region"        = "US1"
+2025-10-23T08:55:47.9739877Z             "RestoredFrom"  = "DiskRestorePoint"
+2025-10-23T08:55:47.9740047Z             "Role"          = "DatabaseServer"
+2025-10-23T08:55:47.9740205Z             "Tier"          = "Database"
+2025-10-23T08:55:47.9741540Z         }
+2025-10-23T08:55:47.9741774Z         [90m# (7 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9741936Z     }
+2025-10-23T08:55:47.9741999Z 
+2025-10-23T08:55:47.9742315Z [1m  # module.db_resources_02[0].azapi_resource.os_disk_from_restore_point[0][0m must be [1m[31mreplaced[0m
+2025-10-23T08:55:47.9742677Z [0m[31m-[0m/[32m+[0m[0m resource "azapi_resource" "os_disk_from_restore_point" {
+2025-10-23T08:55:47.9743215Z       [33m~[0m[0m id                        = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/disks/US1-BOFA-WM-DB-VM02-OsDisk" -> (known after apply)
+2025-10-23T08:55:47.9743513Z         name                      = "US1-BOFA-WM-DB-VM02-OsDisk"
+2025-10-23T08:55:47.9743811Z       [33m~[0m[0m output                    = jsonencode({}) -> (known after apply)
+2025-10-23T08:55:47.9744332Z       [33m~[0m[0m parent_id                 = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB" -> (known after apply) [31m# forces replacement[0m[0m
+2025-10-23T08:55:47.9744580Z         tags                      = {
+2025-10-23T08:55:47.9744743Z             "Architecture"  = "Shared-Hub-Spoke"
+2025-10-23T08:55:47.9744905Z             "Client"        = "BOFA"
+2025-10-23T08:55:47.9745061Z             "Environment"   = "WALMART"
+2025-10-23T08:55:47.9745223Z             "HubSharedWith" = "CS-BOFA"
+2025-10-23T08:55:47.9745367Z             "Instance"      = "DB-VM02"
+2025-10-23T08:55:47.9745527Z             "ManagedBy"     = "Terraform"
+2025-10-23T08:55:47.9745680Z             "Module"        = "db"
+2025-10-23T08:55:47.9745833Z             "Owner"         = "CloudOps-Team"
+2025-10-23T08:55:47.9745997Z             "Project"       = "EM-NextGen"
+2025-10-23T08:55:47.9746166Z             "Purpose"       = "Oracle Database OS Disk"
+2025-10-23T08:55:47.9746325Z             "Region"        = "US1"
+2025-10-23T08:55:47.9746471Z             "RestoredFrom"  = "DiskRestorePoint"
+2025-10-23T08:55:47.9746644Z             "Role"          = "DatabaseServer"
+2025-10-23T08:55:47.9746801Z             "Tier"          = "Database"
+2025-10-23T08:55:47.9746938Z         }
+2025-10-23T08:55:47.9747181Z         [90m# (7 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9747437Z     }
+2025-10-23T08:55:47.9747484Z 
+2025-10-23T08:55:47.9747808Z [1m  # module.db_resources_02[0].azapi_resource.vm_from_restore_point[0][0m must be [1m[31mreplaced[0m
+2025-10-23T08:55:47.9748153Z [0m[31m-[0m/[32m+[0m[0m resource "azapi_resource" "vm_from_restore_point" {
+2025-10-23T08:55:47.9748437Z       [33m~[0m[0m body                      = jsonencode(
+2025-10-23T08:55:47.9748586Z             {
+2025-10-23T08:55:47.9748794Z               [31m-[0m[0m identity   = {
+2025-10-23T08:55:47.9749019Z                   [31m-[0m[0m type = "SystemAssigned"
+2025-10-23T08:55:47.9749172Z                 }
+2025-10-23T08:55:47.9749416Z               [31m-[0m[0m properties = {
+2025-10-23T08:55:47.9749650Z                   [31m-[0m[0m hardwareProfile = {
+2025-10-23T08:55:47.9749891Z                       [31m-[0m[0m vmSize = "Standard_E4ds_v4"
+2025-10-23T08:55:47.9750049Z                     }
+2025-10-23T08:55:47.9750385Z                   [31m-[0m[0m networkProfile  = {
+2025-10-23T08:55:47.9750642Z                       [31m-[0m[0m networkInterfaces = [
+2025-10-23T08:55:47.9750861Z                           [31m-[0m[0m {
+2025-10-23T08:55:47.9751350Z                               [31m-[0m[0m id         = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Network/networkInterfaces/US1-BOFA-WM-DB-VM02-NIC"
+2025-10-23T08:55:47.9751776Z                               [31m-[0m[0m properties = {
+2025-10-23T08:55:47.9752019Z                                   [31m-[0m[0m primary = true
+2025-10-23T08:55:47.9752167Z                                 }
+2025-10-23T08:55:47.9752285Z                             },
+2025-10-23T08:55:47.9752420Z                         ]
+2025-10-23T08:55:47.9752555Z                     }
+2025-10-23T08:55:47.9752771Z                   [31m-[0m[0m securityProfile = {
+2025-10-23T08:55:47.9753034Z                       [31m-[0m[0m securityType = "TrustedLaunch"
+2025-10-23T08:55:47.9753280Z                       [31m-[0m[0m uefiSettings = {
+2025-10-23T08:55:47.9753537Z                           [31m-[0m[0m secureBootEnabled = true
+2025-10-23T08:55:47.9753776Z                           [31m-[0m[0m vTpmEnabled       = true
+2025-10-23T08:55:47.9753928Z                         }
+2025-10-23T08:55:47.9754059Z                     }
+2025-10-23T08:55:47.9754282Z                   [31m-[0m[0m storageProfile  = {
+2025-10-23T08:55:47.9754507Z                       [31m-[0m[0m osDisk = {
+2025-10-23T08:55:47.9754753Z                           [31m-[0m[0m caching      = "ReadWrite"
+2025-10-23T08:55:47.9755007Z                           [31m-[0m[0m createOption = "Attach"
+2025-10-23T08:55:47.9755254Z                           [31m-[0m[0m managedDisk  = {
+2025-10-23T08:55:47.9755714Z                               [31m-[0m[0m id = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/disks/US1-BOFA-WM-DB-VM02-OsDisk"
+2025-10-23T08:55:47.9755965Z                             }
+2025-10-23T08:55:47.9756222Z                           [31m-[0m[0m name         = "US1-BOFA-WM-DB-VM02-OsDisk"
+2025-10-23T08:55:47.9756480Z                           [31m-[0m[0m osType       = "Linux"
+2025-10-23T08:55:47.9756630Z                         }
+2025-10-23T08:55:47.9756762Z                     }
+2025-10-23T08:55:47.9756892Z                 }
+2025-10-23T08:55:47.9757023Z             }
+2025-10-23T08:55:47.9757170Z         ) -> (known after apply)
+2025-10-23T08:55:47.9757657Z       [33m~[0m[0m id                        = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-DB-VM02" -> (known after apply)
+2025-10-23T08:55:47.9757943Z         name                      = "US1-BOFA-WM-DB-VM02"
+2025-10-23T08:55:47.9758227Z       [33m~[0m[0m output                    = jsonencode({}) -> (known after apply)
+2025-10-23T08:55:47.9758706Z       [33m~[0m[0m parent_id                 = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB" -> (known after apply) [31m# forces replacement[0m[0m
+2025-10-23T08:55:47.9759013Z         tags                      = {
+2025-10-23T08:55:47.9759171Z             "Architecture"  = "Shared-Hub-Spoke"
+2025-10-23T08:55:47.9759342Z             "Client"        = "BOFA"
+2025-10-23T08:55:47.9759502Z             "Environment"   = "WALMART"
+2025-10-23T08:55:47.9759662Z             "HubSharedWith" = "CS-BOFA"
+2025-10-23T08:55:47.9759806Z             "Instance"      = "DB-VM02"
+2025-10-23T08:55:47.9759964Z             "ManagedBy"     = "Terraform"
+2025-10-23T08:55:47.9760118Z             "Module"        = "db"
+2025-10-23T08:55:47.9766139Z             "OS"            = "Oracle Linux"
+2025-10-23T08:55:47.9766443Z             "Owner"         = "CloudOps-Team"
+2025-10-23T08:55:47.9766611Z             "Project"       = "EM-NextGen"
+2025-10-23T08:55:47.9766788Z             "Purpose"       = "Oracle Database Server"
+2025-10-23T08:55:47.9766973Z             "Region"        = "US1"
+2025-10-23T08:55:47.9767122Z             "RestoredFrom"  = "VMRestorePoint"
+2025-10-23T08:55:47.9767295Z             "Role"          = "DatabaseServer"
+2025-10-23T08:55:47.9767458Z             "Tier"          = "Database"
+2025-10-23T08:55:47.9767598Z         }
+2025-10-23T08:55:47.9768138Z         [90m# (6 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9768308Z     }
+2025-10-23T08:55:47.9768356Z 
+2025-10-23T08:55:47.9768752Z [1m  # module.db_resources_02[0].azurerm_virtual_machine_data_disk_attachment.oracle_data_disk_attachment_restore[0][0m must be [1m[31mreplaced[0m
+2025-10-23T08:55:47.9771404Z [0m[31m-[0m/[32m+[0m[0m resource "azurerm_virtual_machine_data_disk_attachment" "oracle_data_disk_attachment_restore" {
+2025-10-23T08:55:47.9772065Z       [33m~[0m[0m id                        = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-DB-VM02/dataDisks/US1-BOFA-WM-DB-VM02-DataDisk-1" -> (known after apply)
+2025-10-23T08:55:47.9772805Z       [33m~[0m[0m managed_disk_id           = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/disks/US1-BOFA-WM-DB-VM02-DataDisk-1" -> (known after apply) [31m# forces replacement[0m[0m
+2025-10-23T08:55:47.9773531Z       [33m~[0m[0m virtual_machine_id        = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-DB-VM02" -> (known after apply) [31m# forces replacement[0m[0m
+2025-10-23T08:55:47.9773922Z         [90m# (4 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9774080Z     }
+2025-10-23T08:55:47.9774128Z 
+2025-10-23T08:55:47.9774522Z [1m  # module.db_resources_02[0].azurerm_virtual_machine_data_disk_attachment.oracle_data_disk_attachment_restore[1][0m must be [1m[31mreplaced[0m
+2025-10-23T08:55:47.9774971Z [0m[31m-[0m/[32m+[0m[0m resource "azurerm_virtual_machine_data_disk_attachment" "oracle_data_disk_attachment_restore" {
+2025-10-23T08:55:47.9775615Z       [33m~[0m[0m id                        = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-DB-VM02/dataDisks/US1-BOFA-WM-DB-VM02-DataDisk-2" -> (known after apply)
+2025-10-23T08:55:47.9776340Z       [33m~[0m[0m managed_disk_id           = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/disks/US1-BOFA-WM-DB-VM02-DataDisk-2" -> (known after apply) [31m# forces replacement[0m[0m
+2025-10-23T08:55:47.9777047Z       [33m~[0m[0m virtual_machine_id        = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-DB-VM02" -> (known after apply) [31m# forces replacement[0m[0m
+2025-10-23T08:55:47.9777439Z         [90m# (4 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9777723Z     }
+2025-10-23T08:55:47.9777771Z 
+2025-10-23T08:55:47.9778162Z [1m  # module.db_resources_02[0].azurerm_virtual_machine_data_disk_attachment.oracle_data_disk_attachment_restore[2][0m must be [1m[31mreplaced[0m
+2025-10-23T08:55:47.9778608Z [0m[31m-[0m/[32m+[0m[0m resource "azurerm_virtual_machine_data_disk_attachment" "oracle_data_disk_attachment_restore" {
+2025-10-23T08:55:47.9779249Z       [33m~[0m[0m id                        = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-DB-VM02/dataDisks/US1-BOFA-WM-DB-VM02-DataDisk-3" -> (known after apply)
+2025-10-23T08:55:47.9779967Z       [33m~[0m[0m managed_disk_id           = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/disks/US1-BOFA-WM-DB-VM02-DataDisk-3" -> (known after apply) [31m# forces replacement[0m[0m
+2025-10-23T08:55:47.9780823Z       [33m~[0m[0m virtual_machine_id        = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-DB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-DB-VM02" -> (known after apply) [31m# forces replacement[0m[0m
+2025-10-23T08:55:47.9781223Z         [90m# (4 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9781452Z     }
+2025-10-23T08:55:47.9781500Z 
+2025-10-23T08:55:47.9781789Z [1m  # module.sftp[0].data.azurerm_client_config.current[0m will be read during apply
+2025-10-23T08:55:47.9782018Z   # (depends on a resource or a module with changes pending)
+2025-10-23T08:55:47.9782293Z [0m [36m<=[0m[0m data "azurerm_client_config" "current" {
+2025-10-23T08:55:47.9782561Z       [32m+[0m[0m client_id       = (known after apply)
+2025-10-23T08:55:47.9782798Z       [32m+[0m[0m id              = (known after apply)
+2025-10-23T08:55:47.9783050Z       [32m+[0m[0m object_id       = (known after apply)
+2025-10-23T08:55:47.9783309Z       [32m+[0m[0m subscription_id = (known after apply)
+2025-10-23T08:55:47.9783572Z       [32m+[0m[0m tenant_id       = (known after apply)
+2025-10-23T08:55:47.9783725Z     }
+2025-10-23T08:55:47.9783772Z 
+2025-10-23T08:55:47.9784133Z [1m  # module.ado_resources[0].module.compute["US1-BOFA-WM-ADO-VM01"].azurerm_windows_virtual_machine.vm[0m will be updated in-place
+2025-10-23T08:55:47.9784483Z [0m  [33m~[0m[0m resource "azurerm_windows_virtual_machine" "vm" {
+2025-10-23T08:55:47.9784781Z         id                                                     = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-ADO/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-ADO-VM01"
+2025-10-23T08:55:47.9785053Z         name                                                   = "US1-BOFA-WM-ADO-VM01"
+2025-10-23T08:55:47.9785398Z       [33m~[0m[0m patch_assessment_mode                                  = "AutomaticByPlatform" [33m->[0m[0m "ImageDefault"
+2025-10-23T08:55:47.9785597Z         tags                                                   = {
+2025-10-23T08:55:47.9785785Z             "Architecture"  = "Shared-Hub-Spoke"
+2025-10-23T08:55:47.9785950Z             "Client"        = "BOFA"
+2025-10-23T08:55:47.9786091Z             "Environment"   = "WALMART"
+2025-10-23T08:55:47.9786250Z             "HubSharedWith" = "CS-BOFA"
+2025-10-23T08:55:47.9786419Z             "ManagedBy"     = "Terraform"
+2025-10-23T08:55:47.9786579Z             "Owner"         = "CloudOps-Team"
+2025-10-23T08:55:47.9786739Z             "Project"       = "EM-NextGen"
+2025-10-23T08:55:47.9786933Z             "Purpose"       = "Azure DevOps Build Agent"
+2025-10-23T08:55:47.9787097Z             "Region"        = "US1"
+2025-10-23T08:55:47.9787250Z             "Role"          = "ADOAgent"
+2025-10-23T08:55:47.9787399Z             "Tier"          = "DevOps"
+2025-10-23T08:55:47.9787542Z         }
+2025-10-23T08:55:47.9787826Z       [33m~[0m[0m vm_agent_platform_updates_enabled                      = true [33m->[0m[0m false
+2025-10-23T08:55:47.9788111Z         [90m# (40 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9788261Z 
+2025-10-23T08:55:47.9788471Z         [90m# (4 unchanged blocks hidden)[0m[0m
+2025-10-23T08:55:47.9788622Z     }
+2025-10-23T08:55:47.9788686Z 
+2025-10-23T08:55:47.9789044Z [1m  # module.app_resources[0].module.compute["US1-BOFA-WM-APP-VM01"].azurerm_windows_virtual_machine.vm[0m will be updated in-place
+2025-10-23T08:55:47.9789381Z [0m  [33m~[0m[0m resource "azurerm_windows_virtual_machine" "vm" {
+2025-10-23T08:55:47.9789683Z         id                                                     = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-APP/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-APP-VM01"
+2025-10-23T08:55:47.9789954Z         name                                                   = "US1-BOFA-WM-APP-VM01"
+2025-10-23T08:55:47.9790401Z       [33m~[0m[0m patch_assessment_mode                                  = "AutomaticByPlatform" [33m->[0m[0m "ImageDefault"
+2025-10-23T08:55:47.9790608Z         tags                                                   = {
+2025-10-23T08:55:47.9790769Z             "Application"   = "AppServices"
+2025-10-23T08:55:47.9790941Z             "Architecture"  = "Shared-Hub-Spoke"
+2025-10-23T08:55:47.9791105Z             "Client"        = "BOFA"
+2025-10-23T08:55:47.9791260Z             "Environment"   = "WALMART"
+2025-10-23T08:55:47.9791479Z             "HubSharedWith" = "CS-BOFA"
+2025-10-23T08:55:47.9791627Z             "ManagedBy"     = "Terraform"
+2025-10-23T08:55:47.9791794Z             "Owner"         = "CloudOps-Team"
+2025-10-23T08:55:47.9791954Z             "Project"       = "EM-NextGen"
+2025-10-23T08:55:47.9792119Z             "Purpose"       = "Production-Walmart"
+2025-10-23T08:55:47.9792274Z             "Region"        = "US1"
+2025-10-23T08:55:47.9792429Z             "Role"          = "ApplicationServer"
+2025-10-23T08:55:47.9792587Z             "Tier"          = "App"
+2025-10-23T08:55:47.9792723Z         }
+2025-10-23T08:55:47.9793011Z       [33m~[0m[0m vm_agent_platform_updates_enabled                      = true [33m->[0m[0m false
+2025-10-23T08:55:47.9793295Z         [90m# (40 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9793385Z 
+2025-10-23T08:55:47.9793588Z         [90m# (4 unchanged blocks hidden)[0m[0m
+2025-10-23T08:55:47.9793739Z     }
+2025-10-23T08:55:47.9793804Z 
+2025-10-23T08:55:47.9794124Z [1m  # module.spoke_vnet.module.vnet_peering[0].data.azurerm_virtual_network.aadds_vnet[0m will be read during apply
+2025-10-23T08:55:47.9794376Z   # (depends on a resource or a module with changes pending)
+2025-10-23T08:55:47.9794660Z [0m [36m<=[0m[0m data "azurerm_virtual_network" "aadds_vnet" {
+2025-10-23T08:55:47.9794945Z       [32m+[0m[0m address_space           = (known after apply)
+2025-10-23T08:55:47.9795216Z       [32m+[0m[0m dns_servers             = (known after apply)
+2025-10-23T08:55:47.9795478Z       [32m+[0m[0m guid                    = (known after apply)
+2025-10-23T08:55:47.9795732Z       [32m+[0m[0m id                      = (known after apply)
+2025-10-23T08:55:47.9795997Z       [32m+[0m[0m location                = (known after apply)
+2025-10-23T08:55:47.9796258Z       [32m+[0m[0m name                    = "US1-BOFA-P-DS-VNET"
+2025-10-23T08:55:47.9796523Z       [32m+[0m[0m resource_group_name     = "US1-BOFA-P-DS"
+2025-10-23T08:55:47.9796780Z       [32m+[0m[0m subnets                 = (known after apply)
+2025-10-23T08:55:47.9797038Z       [32m+[0m[0m tags                    = (known after apply)
+2025-10-23T08:55:47.9797306Z       [32m+[0m[0m vnet_peerings           = (known after apply)
+2025-10-23T08:55:47.9797583Z       [32m+[0m[0m vnet_peerings_addresses = (known after apply)
+2025-10-23T08:55:47.9797746Z     }
+2025-10-23T08:55:47.9798653Z 
+2025-10-23T08:55:47.9799035Z [1m  # module.spoke_vnet.module.vnet_peering[0].data.azurerm_virtual_network.local_vnet[0m will be read during apply
+2025-10-23T08:55:47.9799289Z   # (depends on a resource or a module with changes pending)
+2025-10-23T08:55:47.9799751Z [0m [36m<=[0m[0m data "azurerm_virtual_network" "local_vnet" {
+2025-10-23T08:55:47.9800029Z       [32m+[0m[0m address_space           = (known after apply)
+2025-10-23T08:55:47.9800416Z       [32m+[0m[0m dns_servers             = (known after apply)
+2025-10-23T08:55:47.9800682Z       [32m+[0m[0m guid                    = (known after apply)
+2025-10-23T08:55:47.9800944Z       [32m+[0m[0m id                      = (known after apply)
+2025-10-23T08:55:47.9801188Z       [32m+[0m[0m location                = (known after apply)
+2025-10-23T08:55:47.9801461Z       [32m+[0m[0m name                    = "US1-BOFA-WM-SPOKE-VNET"
+2025-10-23T08:55:47.9801736Z       [32m+[0m[0m resource_group_name     = "US1-BOFA-WM-SPOKE"
+2025-10-23T08:55:47.9802047Z       [32m+[0m[0m subnets                 = (known after apply)
+2025-10-23T08:55:47.9802313Z       [32m+[0m[0m tags                    = (known after apply)
+2025-10-23T08:55:47.9802576Z       [32m+[0m[0m vnet_peerings           = (known after apply)
+2025-10-23T08:55:47.9802856Z       [32m+[0m[0m vnet_peerings_addresses = (known after apply)
+2025-10-23T08:55:47.9803018Z     }
+2025-10-23T08:55:47.9803065Z 
+2025-10-23T08:55:47.9803462Z [1m  # module.spoke_vnet.module.vnet_peering[0].azurerm_virtual_network_peering.aadds_to_local[0m must be [1m[31mreplaced[0m
+2025-10-23T08:55:47.9803914Z [0m[31m-[0m/[32m+[0m[0m resource "azurerm_virtual_network_peering" "aadds_to_local" {
+2025-10-23T08:55:47.9804591Z       [33m~[0m[0m id                                     = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-P-DS/providers/Microsoft.Network/virtualNetworks/US1-BOFA-P-DS-VNET/virtualNetworkPeerings/US1-BOFA-P-DS-VNET-to-US1-BOFA-WM-SPOKE-VNET" -> (known after apply)
+2025-10-23T08:55:47.9805048Z       [31m-[0m[0m local_subnet_names                     = [] [90m-> null[0m[0m
+2025-10-23T08:55:47.9805255Z         name                                   = "US1-BOFA-P-DS-VNET-to-US1-BOFA-WM-SPOKE-VNET"
+2025-10-23T08:55:47.9805574Z       [31m-[0m[0m only_ipv6_peering_enabled              = false [90m-> null[0m[0m
+2025-10-23T08:55:47.9805862Z       [31m-[0m[0m remote_subnet_names                    = [] [90m-> null[0m[0m
+2025-10-23T08:55:47.9806477Z       [33m~[0m[0m remote_virtual_network_id              = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET" -> (known after apply) [31m# forces replacement[0m[0m
+2025-10-23T08:55:47.9806887Z         [90m# (7 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9807041Z     }
+2025-10-23T08:55:47.9807101Z 
+2025-10-23T08:55:47.9807439Z [1m  # module.spoke_vnet.module.vnet_peering[0].azurerm_virtual_network_peering.local_to_aadds[0m must be [1m[31mreplaced[0m
+2025-10-23T08:55:47.9807809Z [0m[31m-[0m/[32m+[0m[0m resource "azurerm_virtual_network_peering" "local_to_aadds" {
+2025-10-23T08:55:47.9808490Z       [33m~[0m[0m id                                     = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/virtualNetworkPeerings/US1-BOFA-WM-SPOKE-VNET-to-US1-BOFA-P-DS-VNET" -> (known after apply)
+2025-10-23T08:55:47.9808943Z       [31m-[0m[0m local_subnet_names                     = [] [90m-> null[0m[0m
+2025-10-23T08:55:47.9809151Z         name                                   = "US1-BOFA-WM-SPOKE-VNET-to-US1-BOFA-P-DS-VNET"
+2025-10-23T08:55:47.9809467Z       [31m-[0m[0m only_ipv6_peering_enabled              = false [90m-> null[0m[0m
+2025-10-23T08:55:47.9809766Z       [31m-[0m[0m remote_subnet_names                    = [] [90m-> null[0m[0m
+2025-10-23T08:55:47.9810512Z       [33m~[0m[0m remote_virtual_network_id              = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-P-DS/providers/Microsoft.Network/virtualNetworks/US1-BOFA-P-DS-VNET" -> (known after apply) [31m# forces replacement[0m[0m
+2025-10-23T08:55:47.9811001Z         [90m# (7 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9811157Z     }
+2025-10-23T08:55:47.9811205Z 
+2025-10-23T08:55:47.9811547Z [1m  # module.web_resources[0].module.application_gateway[0].azurerm_application_gateway.appgw[0m will be updated in-place
+2025-10-23T08:55:47.9811888Z [0m  [33m~[0m[0m resource "azurerm_application_gateway" "appgw" {
+2025-10-23T08:55:47.9812188Z         id                                = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW"
+2025-10-23T08:55:47.9812462Z         name                              = "US1-BOFA-WM-WEB-AGW"
+2025-10-23T08:55:47.9812619Z         tags                              = {
+2025-10-23T08:55:47.9812777Z             "Architecture"  = "Shared-Hub-Spoke"
+2025-10-23T08:55:47.9812927Z             "Client"        = "BOFA"
+2025-10-23T08:55:47.9813084Z             "Environment"   = "WALMART"
+2025-10-23T08:55:47.9813249Z             "HubSharedWith" = "CS-BOFA"
+2025-10-23T08:55:47.9813410Z             "ManagedBy"     = "Terraform"
+2025-10-23T08:55:47.9813570Z             "Owner"         = "CloudOps-Team"
+2025-10-23T08:55:47.9813728Z             "Project"       = "EM-NextGen"
+2025-10-23T08:55:47.9813952Z             "Purpose"       = "Production-Walmart"
+2025-10-23T08:55:47.9814098Z             "Region"        = "US1"
+2025-10-23T08:55:47.9814238Z         }
+2025-10-23T08:55:47.9814470Z         [90m# (8 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9814560Z 
+2025-10-23T08:55:47.9814757Z       [31m-[0m[0m backend_http_settings {
+2025-10-23T08:55:47.9815090Z           [31m-[0m[0m affinity_cookie_name                = "ApplicationGatewayAffinity" [90m-> null[0m[0m
+2025-10-23T08:55:47.9815424Z           [31m-[0m[0m cookie_based_affinity               = "Enabled" [90m-> null[0m[0m
+2025-10-23T08:55:47.9816080Z           [31m-[0m[0m id                                  = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/backendHttpSettingsCollection/US1-BOFA-CS-APPGWBACKPOOLSETTINGS01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9816580Z           [31m-[0m[0m name                                = "US1-BOFA-CS-APPGWBACKPOOLSETTINGS01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9816911Z           [31m-[0m[0m pick_host_name_from_backend_address = false [90m-> null[0m[0m
+2025-10-23T08:55:47.9817212Z           [31m-[0m[0m port                                = 443 [90m-> null[0m[0m
+2025-10-23T08:55:47.9817795Z           [31m-[0m[0m probe_id                            = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/probes/US1-BOFA-CS-APPGWHP01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9818248Z           [31m-[0m[0m probe_name                          = "US1-BOFA-CS-APPGWHP01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9818559Z           [31m-[0m[0m protocol                            = "Https" [90m-> null[0m[0m
+2025-10-23T08:55:47.9818850Z           [31m-[0m[0m request_timeout                     = 300 [90m-> null[0m[0m
+2025-10-23T08:55:47.9819150Z           [31m-[0m[0m trusted_root_certificate_names      = [] [90m-> null[0m[0m
+2025-10-23T08:55:47.9819425Z             [90m# (2 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9819565Z         }
+2025-10-23T08:55:47.9819776Z       [32m+[0m[0m backend_http_settings {
+2025-10-23T08:55:47.9820077Z           [32m+[0m[0m affinity_cookie_name                = "ApplicationGatewayAffinity"
+2025-10-23T08:55:47.9820474Z           [32m+[0m[0m cookie_based_affinity               = "Enabled"
+2025-10-23T08:55:47.9820757Z           [32m+[0m[0m id                                  = (known after apply)
+2025-10-23T08:55:47.9821066Z           [32m+[0m[0m name                                = "US1-BOFA-DC-APPGWBACKPOOLSETTINGS01"
+2025-10-23T08:55:47.9821549Z           [32m+[0m[0m pick_host_name_from_backend_address = false
+2025-10-23T08:55:47.9821815Z           [32m+[0m[0m port                                = 443
+2025-10-23T08:55:47.9822082Z           [32m+[0m[0m probe_id                            = (known after apply)
+2025-10-23T08:55:47.9822366Z           [32m+[0m[0m probe_name                          = "US1-BOFA-DC-APPGWHP01"
+2025-10-23T08:55:47.9822696Z           [32m+[0m[0m protocol                            = "Https"
+2025-10-23T08:55:47.9822948Z           [32m+[0m[0m request_timeout                     = 300
+2025-10-23T08:55:47.9823210Z           [32m+[0m[0m trusted_root_certificate_names      = []
+2025-10-23T08:55:47.9823473Z             [90m# (2 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9823630Z         }
+2025-10-23T08:55:47.9823839Z       [32m+[0m[0m backend_http_settings {
+2025-10-23T08:55:47.9824139Z           [32m+[0m[0m affinity_cookie_name                = "ApplicationGatewayAffinity"
+2025-10-23T08:55:47.9824417Z           [32m+[0m[0m cookie_based_affinity               = "Enabled"
+2025-10-23T08:55:47.9825032Z           [32m+[0m[0m id                                  = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/backendHttpSettingsCollection/US1-BOFA-CS-APPGWBACKPOOLSETTINGS01"
+2025-10-23T08:55:47.9825565Z           [32m+[0m[0m name                                = "US1-BOFA-CS-APPGWBACKPOOLSETTINGS01"
+2025-10-23T08:55:47.9825860Z           [32m+[0m[0m pick_host_name_from_backend_address = false
+2025-10-23T08:55:47.9826132Z           [32m+[0m[0m port                                = 443
+2025-10-23T08:55:47.9828372Z           [32m+[0m[0m probe_id                            = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/probes/US1-BOFA-CS-APPGWHP01"
+2025-10-23T08:55:47.9828815Z           [32m+[0m[0m probe_name                          = "US1-BOFA-CS-APPGWHP01"
+2025-10-23T08:55:47.9829086Z           [32m+[0m[0m protocol                            = "Https"
+2025-10-23T08:55:47.9829347Z           [32m+[0m[0m request_timeout                     = 300
+2025-10-23T08:55:47.9829617Z           [32m+[0m[0m trusted_root_certificate_names      = []
+2025-10-23T08:55:47.9829776Z         }
+2025-10-23T08:55:47.9829826Z 
+2025-10-23T08:55:47.9830031Z       [31m-[0m[0m http_listener {
+2025-10-23T08:55:47.9830852Z           [31m-[0m[0m frontend_ip_configuration_id   = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/frontendIPConfigurations/appGatewayFrontendIP" [90m-> null[0m[0m
+2025-10-23T08:55:47.9831355Z           [31m-[0m[0m frontend_ip_configuration_name = "appGatewayFrontendIP" [90m-> null[0m[0m
+2025-10-23T08:55:47.9831976Z           [31m-[0m[0m frontend_port_id               = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/frontendPorts/httpsPort" [90m-> null[0m[0m
+2025-10-23T08:55:47.9832418Z           [31m-[0m[0m frontend_port_name             = "httpsPort" [90m-> null[0m[0m
+2025-10-23T08:55:47.9832713Z           [31m-[0m[0m host_names                     = [] [90m-> null[0m[0m
+2025-10-23T08:55:47.9833317Z           [31m-[0m[0m id                             = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/httpListeners/US1-BOFA-WM-APPGWFRONTLISTENER01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9833790Z           [31m-[0m[0m name                           = "US1-BOFA-WM-APPGWFRONTLISTENER01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9834096Z           [31m-[0m[0m protocol                       = "Https" [90m-> null[0m[0m
+2025-10-23T08:55:47.9834477Z           [31m-[0m[0m require_sni                    = false [90m-> null[0m[0m
+2025-10-23T08:55:47.9835086Z           [31m-[0m[0m ssl_certificate_id             = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/sslCertificates/starcertentcom2025" [90m-> null[0m[0m
+2025-10-23T08:55:47.9835554Z           [31m-[0m[0m ssl_certificate_name           = "starcertentcom2025" [90m-> null[0m[0m
+2025-10-23T08:55:47.9835835Z             [90m# (4 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9835994Z         }
+2025-10-23T08:55:47.9836194Z       [31m-[0m[0m http_listener {
+2025-10-23T08:55:47.9836857Z           [31m-[0m[0m frontend_ip_configuration_id   = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/frontendIPConfigurations/appGatewayFrontendIP" [90m-> null[0m[0m
+2025-10-23T08:55:47.9837350Z           [31m-[0m[0m frontend_ip_configuration_name = "appGatewayFrontendIP" [90m-> null[0m[0m
+2025-10-23T08:55:47.9837956Z           [31m-[0m[0m frontend_port_id               = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/frontendPorts/httpsPort" [90m-> null[0m[0m
+2025-10-23T08:55:47.9838496Z           [31m-[0m[0m frontend_port_name             = "httpsPort" [90m-> null[0m[0m
+2025-10-23T08:55:47.9838826Z           [31m-[0m[0m host_name                      = "emdcbofa.certent.com" [90m-> null[0m[0m
+2025-10-23T08:55:47.9839128Z           [31m-[0m[0m host_names                     = [] [90m-> null[0m[0m
+2025-10-23T08:55:47.9839735Z           [31m-[0m[0m id                             = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/httpListeners/US1-BOFA-CS-APPGWFRONTLISTENER01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9840216Z           [31m-[0m[0m name                           = "US1-BOFA-CS-APPGWFRONTLISTENER01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9840637Z           [31m-[0m[0m protocol                       = "Https" [90m-> null[0m[0m
+2025-10-23T08:55:47.9840913Z           [31m-[0m[0m require_sni                    = true [90m-> null[0m[0m
+2025-10-23T08:55:47.9841516Z           [31m-[0m[0m ssl_certificate_id             = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/sslCertificates/starcertentcom2025" [90m-> null[0m[0m
+2025-10-23T08:55:47.9841988Z           [31m-[0m[0m ssl_certificate_name           = "starcertentcom2025" [90m-> null[0m[0m
+2025-10-23T08:55:47.9842268Z             [90m# (3 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9842427Z         }
+2025-10-23T08:55:47.9842626Z       [32m+[0m[0m http_listener {
+2025-10-23T08:55:47.9842912Z           [32m+[0m[0m frontend_ip_configuration_id   = (known after apply)
+2025-10-23T08:55:47.9843226Z           [32m+[0m[0m frontend_ip_configuration_name = "appGatewayFrontendIP"
+2025-10-23T08:55:47.9843531Z           [32m+[0m[0m frontend_port_id               = (known after apply)
+2025-10-23T08:55:47.9843807Z           [32m+[0m[0m frontend_port_name             = "httpsPort"
+2025-10-23T08:55:47.9844079Z           [32m+[0m[0m host_name                      = "emcsbofa.certent.com"
+2025-10-23T08:55:47.9844328Z           [32m+[0m[0m host_names                     = []
+2025-10-23T08:55:47.9844589Z           [32m+[0m[0m id                             = (known after apply)
+2025-10-23T08:55:47.9844883Z           [32m+[0m[0m name                           = "US1-BOFA-CS-APPGWFRONTLISTENER01"
+2025-10-23T08:55:47.9845151Z           [32m+[0m[0m protocol                       = "Https"
+2025-10-23T08:55:47.9845484Z           [32m+[0m[0m require_sni                    = true
+2025-10-23T08:55:47.9845760Z           [32m+[0m[0m ssl_certificate_id             = (known after apply)
+2025-10-23T08:55:47.9846054Z           [32m+[0m[0m ssl_certificate_name           = "starcertentcom2025"
+2025-10-23T08:55:47.9846347Z           [32m+[0m[0m ssl_profile_id                 = (known after apply)
+2025-10-23T08:55:47.9846596Z             [90m# (2 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9846750Z         }
+2025-10-23T08:55:47.9846955Z       [32m+[0m[0m http_listener {
+2025-10-23T08:55:47.9847236Z           [32m+[0m[0m frontend_ip_configuration_id   = (known after apply)
+2025-10-23T08:55:47.9847549Z           [32m+[0m[0m frontend_ip_configuration_name = "appGatewayFrontendIP"
+2025-10-23T08:55:47.9847848Z           [32m+[0m[0m frontend_port_id               = (known after apply)
+2025-10-23T08:55:47.9848121Z           [32m+[0m[0m frontend_port_name             = "httpsPort"
+2025-10-23T08:55:47.9848409Z           [32m+[0m[0m host_name                      = "emdcbofa.certent.com"
+2025-10-23T08:55:47.9848660Z           [32m+[0m[0m host_names                     = []
+2025-10-23T08:55:47.9848907Z           [32m+[0m[0m id                             = (known after apply)
+2025-10-23T08:55:47.9849264Z           [32m+[0m[0m name                           = "US1-BOFA-DC-APPGWFRONTLISTENER01"
+2025-10-23T08:55:47.9849536Z           [32m+[0m[0m protocol                       = "Https"
+2025-10-23T08:55:47.9849787Z           [32m+[0m[0m require_sni                    = true
+2025-10-23T08:55:47.9850072Z           [32m+[0m[0m ssl_certificate_id             = (known after apply)
+2025-10-23T08:55:47.9850495Z           [32m+[0m[0m ssl_certificate_name           = "starcertentcom2025"
+2025-10-23T08:55:47.9850791Z           [32m+[0m[0m ssl_profile_id                 = (known after apply)
+2025-10-23T08:55:47.9851053Z             [90m# (2 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9851214Z         }
+2025-10-23T08:55:47.9851263Z 
+2025-10-23T08:55:47.9851450Z       [31m-[0m[0m probe {
+2025-10-23T08:55:47.9851756Z           [31m-[0m[0m host                                      = "emdcbofa.certent.com" [90m-> null[0m[0m
+2025-10-23T08:55:47.9852347Z           [31m-[0m[0m id                                        = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/probes/US1-BOFA-CS-APPGWHP01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9852791Z           [31m-[0m[0m interval                                  = 30 [90m-> null[0m[0m
+2025-10-23T08:55:47.9853068Z           [31m-[0m[0m minimum_servers                           = 0 [90m-> null[0m[0m
+2025-10-23T08:55:47.9853391Z           [31m-[0m[0m name                                      = "US1-BOFA-CS-APPGWHP01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9853723Z           [31m-[0m[0m path                                      = "/EM/Account/Login" [90m-> null[0m[0m
+2025-10-23T08:55:47.9854056Z           [31m-[0m[0m pick_host_name_from_backend_http_settings = false [90m-> null[0m[0m
+2025-10-23T08:55:47.9854365Z           [31m-[0m[0m port                                      = 0 [90m-> null[0m[0m
+2025-10-23T08:55:47.9854657Z           [31m-[0m[0m protocol                                  = "Https" [90m-> null[0m[0m
+2025-10-23T08:55:47.9854954Z           [31m-[0m[0m timeout                                   = 30 [90m-> null[0m[0m
+2025-10-23T08:55:47.9855245Z           [31m-[0m[0m unhealthy_threshold                       = 3 [90m-> null[0m[0m
+2025-10-23T08:55:47.9855328Z 
+2025-10-23T08:55:47.9855516Z           [31m-[0m[0m match {
+2025-10-23T08:55:47.9855738Z               [31m-[0m[0m status_code = [
+2025-10-23T08:55:47.9855964Z                   [31m-[0m[0m "200-399",
+2025-10-23T08:55:47.9856175Z                 ] [90m-> null[0m[0m
+2025-10-23T08:55:47.9856502Z                 [90m# (1 unchanged attribute hidden)[0m[0m
+2025-10-23T08:55:47.9856646Z             }
+2025-10-23T08:55:47.9856775Z         }
+2025-10-23T08:55:47.9856966Z       [32m+[0m[0m probe {
+2025-10-23T08:55:47.9857239Z           [32m+[0m[0m host                                      = "emcsbofa.certent.com"
+2025-10-23T08:55:47.9857531Z           [32m+[0m[0m id                                        = (known after apply)
+2025-10-23T08:55:47.9857790Z           [32m+[0m[0m interval                                  = 30
+2025-10-23T08:55:47.9858050Z           [32m+[0m[0m minimum_servers                           = 0
+2025-10-23T08:55:47.9858337Z           [32m+[0m[0m name                                      = "US1-BOFA-CS-APPGWHP01"
+2025-10-23T08:55:47.9858608Z           [32m+[0m[0m path                                      = "/EM/Account/Login"
+2025-10-23T08:55:47.9858896Z           [32m+[0m[0m pick_host_name_from_backend_http_settings = false
+2025-10-23T08:55:47.9859180Z           [32m+[0m[0m protocol                                  = "Https"
+2025-10-23T08:55:47.9859432Z           [32m+[0m[0m timeout                                   = 30
+2025-10-23T08:55:47.9859684Z           [32m+[0m[0m unhealthy_threshold                       = 3
+2025-10-23T08:55:47.9859814Z 
+2025-10-23T08:55:47.9860009Z           [32m+[0m[0m match {
+2025-10-23T08:55:47.9860230Z               [32m+[0m[0m status_code = [
+2025-10-23T08:55:47.9860550Z                   [32m+[0m[0m "200-399",
+2025-10-23T08:55:47.9860706Z                 ]
+2025-10-23T08:55:47.9860951Z                 [90m# (1 unchanged attribute hidden)[0m[0m
+2025-10-23T08:55:47.9861112Z             }
+2025-10-23T08:55:47.9861227Z         }
+2025-10-23T08:55:47.9861411Z       [32m+[0m[0m probe {
+2025-10-23T08:55:47.9861687Z           [32m+[0m[0m host                                      = "emdcbofa.certent.com"
+2025-10-23T08:55:47.9861974Z           [32m+[0m[0m id                                        = (known after apply)
+2025-10-23T08:55:47.9862241Z           [32m+[0m[0m interval                                  = 30
+2025-10-23T08:55:47.9862503Z           [32m+[0m[0m minimum_servers                           = 0
+2025-10-23T08:55:47.9862786Z           [32m+[0m[0m name                                      = "US1-BOFA-DC-APPGWHP01"
+2025-10-23T08:55:47.9863076Z           [32m+[0m[0m path                                      = "/EM/Account/Login"
+2025-10-23T08:55:47.9863366Z           [32m+[0m[0m pick_host_name_from_backend_http_settings = false
+2025-10-23T08:55:47.9863635Z           [32m+[0m[0m protocol                                  = "Https"
+2025-10-23T08:55:47.9863890Z           [32m+[0m[0m timeout                                   = 30
+2025-10-23T08:55:47.9864144Z           [32m+[0m[0m unhealthy_threshold                       = 3
+2025-10-23T08:55:47.9864230Z 
+2025-10-23T08:55:47.9864405Z           [32m+[0m[0m match {
+2025-10-23T08:55:47.9864628Z               [32m+[0m[0m status_code = [
+2025-10-23T08:55:47.9864854Z                   [32m+[0m[0m "200-399",
+2025-10-23T08:55:47.9865000Z                 ]
+2025-10-23T08:55:47.9865236Z                 [90m# (1 unchanged attribute hidden)[0m[0m
+2025-10-23T08:55:47.9865394Z             }
+2025-10-23T08:55:47.9865521Z         }
+2025-10-23T08:55:47.9865573Z 
+2025-10-23T08:55:47.9865789Z       [31m-[0m[0m request_routing_rule {
+2025-10-23T08:55:47.9866387Z           [31m-[0m[0m backend_address_pool_id     = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/backendAddressPools/backendPool" [90m-> null[0m[0m
+2025-10-23T08:55:47.9866850Z           [31m-[0m[0m backend_address_pool_name   = "backendPool" [90m-> null[0m[0m
+2025-10-23T08:55:47.9867536Z           [31m-[0m[0m backend_http_settings_id    = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/backendHttpSettingsCollection/US1-BOFA-CS-APPGWBACKPOOLSETTINGS01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9868148Z           [31m-[0m[0m backend_http_settings_name  = "US1-BOFA-CS-APPGWBACKPOOLSETTINGS01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9868809Z           [31m-[0m[0m http_listener_id            = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/httpListeners/US1-BOFA-CS-APPGWFRONTLISTENER01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9869310Z           [31m-[0m[0m http_listener_name          = "US1-BOFA-CS-APPGWFRONTLISTENER01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9869946Z           [31m-[0m[0m id                          = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/requestRoutingRules/US1-BOFA-CS-APPGWROUTINGRULE01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9870529Z           [31m-[0m[0m name                        = "US1-BOFA-CS-APPGWROUTINGRULE01" [90m-> null[0m[0m
+2025-10-23T08:55:47.9870822Z           [31m-[0m[0m priority                    = 200 [90m-> null[0m[0m
+2025-10-23T08:55:47.9871136Z           [31m-[0m[0m rule_type                   = "Basic" [90m-> null[0m[0m
+2025-10-23T08:55:47.9871476Z             [90m# (6 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9871632Z         }
+2025-10-23T08:55:47.9872003Z       [32m+[0m[0m request_routing_rule {
+2025-10-23T08:55:47.9872574Z           [32m+[0m[0m backend_address_pool_id    = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/backendAddressPools/backendPool"
+2025-10-23T08:55:47.9872990Z           [32m+[0m[0m backend_address_pool_name  = "backendPool"
+2025-10-23T08:55:47.9873626Z           [32m+[0m[0m backend_http_settings_id   = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/backendHttpSettingsCollection/US1-BOFA-CS-APPGWBACKPOOLSETTINGS01"
+2025-10-23T08:55:47.9874110Z           [32m+[0m[0m backend_http_settings_name = "US1-BOFA-CS-APPGWBACKPOOLSETTINGS01"
+2025-10-23T08:55:47.9874728Z           [32m+[0m[0m http_listener_id           = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/httpListeners/US1-BOFA-CS-APPGWFRONTLISTENER01"
+2025-10-23T08:55:47.9875182Z           [32m+[0m[0m http_listener_name         = "US1-BOFA-CS-APPGWFRONTLISTENER01"
+2025-10-23T08:55:47.9875784Z           [32m+[0m[0m id                         = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Network/applicationGateways/US1-BOFA-WM-WEB-AGW/requestRoutingRules/US1-BOFA-CS-APPGWROUTINGRULE01"
+2025-10-23T08:55:47.9876216Z           [32m+[0m[0m name                       = "US1-BOFA-CS-APPGWROUTINGRULE01"
+2025-10-23T08:55:47.9876472Z           [32m+[0m[0m priority                   = 200
+2025-10-23T08:55:47.9876701Z           [32m+[0m[0m rule_type                  = "Basic"
+2025-10-23T08:55:47.9876989Z             [90m# (3 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9877148Z         }
+2025-10-23T08:55:47.9877361Z       [32m+[0m[0m request_routing_rule {
+2025-10-23T08:55:47.9877644Z           [32m+[0m[0m backend_address_pool_id     = (known after apply)
+2025-10-23T08:55:47.9877935Z           [32m+[0m[0m backend_address_pool_name   = "backendPool"
+2025-10-23T08:55:47.9878231Z           [32m+[0m[0m backend_http_settings_id    = (known after apply)
+2025-10-23T08:55:47.9878560Z           [32m+[0m[0m backend_http_settings_name  = "US1-BOFA-DC-APPGWBACKPOOLSETTINGS01"
+2025-10-23T08:55:47.9878855Z           [32m+[0m[0m http_listener_id            = (known after apply)
+2025-10-23T08:55:47.9879253Z           [32m+[0m[0m http_listener_name          = "US1-BOFA-DC-APPGWFRONTLISTENER01"
+2025-10-23T08:55:47.9879549Z           [32m+[0m[0m id                          = (known after apply)
+2025-10-23T08:55:47.9879835Z           [32m+[0m[0m name                        = "US1-BOFA-DC-APPGWROUTINGRULE01"
+2025-10-23T08:55:47.9880104Z           [32m+[0m[0m priority                    = 201
+2025-10-23T08:55:47.9880484Z           [32m+[0m[0m redirect_configuration_id   = (known after apply)
+2025-10-23T08:55:47.9880781Z           [32m+[0m[0m rewrite_rule_set_id         = (known after apply)
+2025-10-23T08:55:47.9881046Z           [32m+[0m[0m rule_type                   = "Basic"
+2025-10-23T08:55:47.9881319Z           [32m+[0m[0m url_path_map_id             = (known after apply)
+2025-10-23T08:55:47.9881585Z             [90m# (3 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9881726Z         }
+2025-10-23T08:55:47.9881793Z 
+2025-10-23T08:55:47.9882016Z         [90m# (10 unchanged blocks hidden)[0m[0m
+2025-10-23T08:55:47.9882160Z     }
+2025-10-23T08:55:47.9882222Z 
+2025-10-23T08:55:47.9882585Z [1m  # module.web_resources[0].module.compute["US1-BOFA-WM-WEB-VM01"].azurerm_windows_virtual_machine.vm[0m will be updated in-place
+2025-10-23T08:55:47.9882938Z [0m  [33m~[0m[0m resource "azurerm_windows_virtual_machine" "vm" {
+2025-10-23T08:55:47.9883289Z         id                                                     = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-WEB/providers/Microsoft.Compute/virtualMachines/US1-BOFA-WM-WEB-VM01"
+2025-10-23T08:55:47.9883561Z         name                                                   = "US1-BOFA-WM-WEB-VM01"
+2025-10-23T08:55:47.9883924Z       [33m~[0m[0m patch_assessment_mode                                  = "AutomaticByPlatform" [33m->[0m[0m "ImageDefault"
+2025-10-23T08:55:47.9884127Z         tags                                                   = {
+2025-10-23T08:55:47.9884276Z             "Application"   = "IIS"
+2025-10-23T08:55:47.9884445Z             "Architecture"  = "Shared-Hub-Spoke"
+2025-10-23T08:55:47.9884611Z             "Client"        = "BOFA"
+2025-10-23T08:55:47.9884773Z             "Environment"   = "WALMART"
+2025-10-23T08:55:47.9884936Z             "HubSharedWith" = "CS-BOFA"
+2025-10-23T08:55:47.9885087Z             "ManagedBy"     = "Terraform"
+2025-10-23T08:55:47.9885254Z             "Owner"         = "CloudOps-Team"
+2025-10-23T08:55:47.9885421Z             "Project"       = "EM-NextGen"
+2025-10-23T08:55:47.9885588Z             "Purpose"       = "Production-Walmart"
+2025-10-23T08:55:47.9885751Z             "Region"        = "US1"
+2025-10-23T08:55:47.9885900Z             "Role"          = "WebServer"
+2025-10-23T08:55:47.9886048Z             "Tier"          = "Web"
+2025-10-23T08:55:47.9886185Z         }
+2025-10-23T08:55:47.9886471Z       [33m~[0m[0m vm_agent_platform_updates_enabled                      = true [33m->[0m[0m false
+2025-10-23T08:55:47.9886750Z         [90m# (40 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9886847Z 
+2025-10-23T08:55:47.9887068Z         [90m# (4 unchanged blocks hidden)[0m[0m
+2025-10-23T08:55:47.9887205Z     }
+2025-10-23T08:55:47.9887264Z 
+2025-10-23T08:55:47.9887659Z [1m  # module.spoke_vnet.module.networking[0].module.vnet.azurerm_subnet.subnet_for_each["US1-BOFA-WM-SPOKE-AG-SUBNET"][0m will be updated in-place
+2025-10-23T08:55:47.9888015Z [0m  [33m~[0m[0m resource "azurerm_subnet" "subnet_for_each" {
+2025-10-23T08:55:47.9888328Z         id                                             = "/subscriptions/8590c10d-ae02-49ca-a8bb-435f047c71e9/resourceGroups/US1-BOFA-WM-SPOKE/providers/Microsoft.Network/virtualNetworks/US1-BOFA-WM-SPOKE-VNET/subnets/US1-BOFA-WM-SPOKE-AG-SUBNET"
+2025-10-23T08:55:47.9888637Z         name                                           = "US1-BOFA-WM-SPOKE-AG-SUBNET"
+2025-10-23T08:55:47.9888901Z       [33m~[0m[0m service_endpoints                              = [
+2025-10-23T08:55:47.9889139Z           [31m-[0m[0m "Microsoft.Storage",
+2025-10-23T08:55:47.9889447Z           [32m+[0m[0m "Microsoft.KeyVault",
+2025-10-23T08:55:47.9889601Z         ]
+2025-10-23T08:55:47.9889828Z         [90m# (10 unchanged attributes hidden)[0m[0m
+2025-10-23T08:55:47.9889982Z     }
+2025-10-23T08:55:47.9890029Z 
+2025-10-23T08:55:47.9890344Z [1mPlan:[0m 10 to add, 5 to change, 10 to destroy.
+2025-10-23T08:55:47.9890614Z [0m[33m╷[0m[0m
+2025-10-23T08:55:47.9890879Z [33m│[0m [0m[1m[33mWarning: [0m[0m[1mArgument is deprecated[0m
+2025-10-23T08:55:47.9891080Z [33m│[0m [0m
+2025-10-23T08:55:47.9891646Z [33m│[0m [0m[0m  with module.spoke_vnet.module.networking[0].module.vnet.azurerm_subnet.subnet_for_each["US1-BOFA-WM-SPOKE-SFTP-SUBNET"],
+2025-10-23T08:55:47.9892108Z [33m│[0m [0m  on .terraform/modules/spoke_vnet.networking.vnet/main.tf line 66, in resource "azurerm_subnet" "subnet_for_each":
+2025-10-23T08:55:47.9892619Z [33m│[0m [0m  66:   enforce_private_link_endpoint_network_policies = [4mlookup(var.subnet_enforce_private_link_endpoint_network_policies, each.value, false)[0m[0m
+2025-10-23T08:55:47.9892917Z [33m│[0m [0m
+2025-10-23T08:55:47.9893216Z [33m│[0m [0m`enforce_private_link_endpoint_network_policies` will be removed in favour
+2025-10-23T08:55:47.9893563Z [33m│[0m [0mof the property `private_endpoint_network_policies` in version 4.0 of the
+2025-10-23T08:55:47.9893901Z [33m│[0m [0mAzureRM Provider
+2025-10-23T08:55:47.9894088Z [33m│[0m [0m
+2025-10-23T08:55:47.9894324Z [33m│[0m [0m(and one more similar warning elsewhere)
+2025-10-23T08:55:47.9894512Z [33m╵[0m[0m
+2025-10-23T08:55:47.9894671Z [90m
+2025-10-23T08:55:47.9894987Z ─────────────────────────────────────────────────────────────────────────────[0m
+2025-10-23T08:55:47.9895074Z 
+2025-10-23T08:55:47.9895234Z Saved the plan to: plan_walmart.tfplan
+2025-10-23T08:55:47.9895322Z 
+2025-10-23T08:55:47.9895487Z To perform exactly these actions, run the following command to apply:
+2025-10-23T08:55:47.9895687Z     terraform apply "plan_walmart.tfplan"
+2025-10-23T08:55:48.0609166Z 
+2025-10-23T08:55:48.0611937Z ✓ Plan file created successfully: plan_walmart.tfplan
+2025-10-23T08:55:48.0626501Z -rw-rw-r-- 1 azureuser azureuser 405K Oct 23 08:55 plan_walmart.tfplan
+2025-10-23T08:55:48.0645488Z 
+2025-10-23T08:55:48.0705791Z ##[section]Finishing: Terraform Plan

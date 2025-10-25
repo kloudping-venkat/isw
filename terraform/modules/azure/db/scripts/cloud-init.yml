@@ -1,0 +1,746 @@
+#cloud-config
+# Database VM Preparation - Cloud-Init Configuration with Oracle Software Install (no DB)
+# Version: 2.0 - Production-Ready with Enhanced Error Handling and Idempotency
+# Last Updated: 2025-10-21
+
+package_update: false
+package_upgrade: false
+
+users:
+  - name: oracle
+    gecos: Oracle Software Owner
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    groups: wheel
+    shell: /bin/bash
+    home: /home/oracle
+
+runcmd:
+  # ========================================
+  # INITIALIZATION AND LOG SETUP
+  # ========================================
+  # Create log directory and files FIRST with proper permissions
+  - mkdir -p /var/log/oracle-prep
+  - touch /var/log/db_prep.log /var/log/oracle_install.log /var/log/db_post_restore.log
+  - chmod 666 /var/log/db_prep.log /var/log/oracle_install.log /var/log/db_post_restore.log
+  - chown root:root /var/log/db_prep.log /var/log/oracle_install.log /var/log/db_post_restore.log
+
+  # Initialize main log file with header
+  - echo "========================================" > /var/log/db_prep.log
+  - echo "Oracle Database VM Preparation Log" >> /var/log/db_prep.log
+  - echo "Start Time: $(date '+%Y-%m-%d %H:%M:%S')" >> /var/log/db_prep.log
+  - echo "Restore Mode: ${restore_from_snapshot}" >> /var/log/db_prep.log
+  - echo "Restore Data Disks Only: ${restore_data_disks_only}" >> /var/log/db_prep.log
+  - echo "========================================" >> /var/log/db_prep.log
+  - echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting Oracle DB VM preparation" | tee -a /var/log/db_prep.log
+
+  # ========================================
+  # USER AND SUDO SETUP
+  # ========================================
+  # Ensure wheel access for oracle user - idempotent
+  - echo "[$(date '+%Y-%m-%d %H:%M:%S')] Setting up oracle user..." | tee -a /var/log/db_prep.log
+  - usermod -aG wheel oracle 2>/dev/null || true
+  - grep -q "^oracle ALL" /etc/sudoers.d/oracle 2>/dev/null || echo "oracle ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/oracle
+  - chmod 440 /etc/sudoers.d/oracle 2>/dev/null || true
+  - echo "[$(date '+%Y-%m-%d %H:%M:%S')] Oracle user setup complete" | tee -a /var/log/db_prep.log
+
+  # Fix file permissions after oracle user is created
+  - [ -f /tmp/install_oracle_software.sh ] && chown oracle:wheel /tmp/install_oracle_software.sh 2>/dev/null || true
+  - [ -f /tmp/db_install.rsp ] && chown oracle:wheel /tmp/db_install.rsp 2>/dev/null || true
+
+  # Install Oracle dependencies (libnsl, libstdc++, libgcc) BEFORE disk mounting
+  - echo "[$(date '+%Y-%m-%d %H:%M:%S')] Installing Oracle dependencies..." | tee -a /var/log/db_prep.log
+  - |
+    if command -v yum &> /dev/null; then
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Detected RHEL/CentOS - installing libnsl..." | tee -a /var/log/db_prep.log
+      yum install -y libnsl libnsl.i686 2>&1 | tee -a /var/log/db_prep.log || yum install -y libnsl 2>&1 | tee -a /var/log/db_prep.log
+      yum install -y libstdc++ libgcc 2>&1 | tee -a /var/log/db_prep.log
+    elif command -v apt-get &> /dev/null; then
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Detected Ubuntu/Debian - installing libnsl..." | tee -a /var/log/db_prep.log
+      apt-get update -qq 2>&1 | tee -a /var/log/db_prep.log
+      apt-get install -y libnsl2 libnsl2:i386 2>&1 | tee -a /var/log/db_prep.log || apt-get install -y libnsl2 2>&1 | tee -a /var/log/db_prep.log
+      apt-get install -y libstdc++6 libgomp1 2>&1 | tee -a /var/log/db_prep.log
+    fi
+  - ldconfig
+  - echo "[$(date '+%Y-%m-%d %H:%M:%S')] Oracle dependencies installed" | tee -a /var/log/db_prep.log
+
+  # Wait for data disks to be attached
+  - sleep 30
+  - echo "[$(date '+%Y-%m-%d %H:%M:%S')] Waiting for data disks..." | tee -a /var/log/db_prep.log
+
+  # Wait for data disks to appear (retry loop)
+  - |
+    for i in {1..30}; do
+      DISK_COUNT=$(lsblk -dpno NAME | grep -v "/dev/sda" | grep -v "/dev/sdb" | grep -v "/dev/sr" | wc -l)
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Attempt $i: Found $DISK_COUNT data disks" | tee -a /var/log/db_prep.log
+      if [ "$DISK_COUNT" -ge 3 ]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] All data disks detected!" | tee -a /var/log/db_prep.log
+        break
+      fi
+      sleep 10
+    done
+
+  - lsblk | tee -a /var/log/db_prep.log
+
+  # Mount data disks
+  - /tmp/mount_data_disks.sh
+
+  # Conditional Oracle setup based on restore mode
+  - |
+    if [ "${restore_data_disks_only}" = "true" ]; then
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Restore mode: Starting post-restore configuration" | tee -a /var/log/db_prep.log
+
+      # ========================================
+      # POST-RESTORE CONFIGURATION UPDATES
+      # ========================================
+
+      # Just fix ownership for restored Oracle
+      chown -R oracle:wheel /u01 /u02 /u03 2>/dev/null || true
+      chmod -R 755 /u01 /u02 /u03 2>/dev/null || true
+
+      # Set Oracle env variables for oracle user (pointing to restored location on /u01)
+      if [ ! -f /home/oracle/.bashrc ] || ! grep -q "ORACLE_HOME" /home/oracle/.bashrc; then
+        echo 'export ORACLE_BASE=/u01/home/app/oracle' >> /home/oracle/.bashrc
+        echo 'export ORACLE_HOME=$ORACLE_BASE/product/19.0.0/dbhome_1' >> /home/oracle/.bashrc
+        echo 'export PATH=$ORACLE_HOME/bin:$PATH' >> /home/oracle/.bashrc
+        chown oracle:wheel /home/oracle/.bashrc
+      fi
+
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Oracle restore setup complete" | tee -a /var/log/db_prep.log
+    else
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Fresh mode: Installing Oracle software" | tee -a /var/log/db_prep.log
+
+      # Create Oracle directories
+      mkdir -p /u01/home/app/oracle/product/19.0.0/dbhome_1
+      chown -R oracle:wheel /u01/home
+      chmod -R 755 /u01/home
+
+      # Set permissions for data directories
+      chown -R oracle:wheel /u02 /u03
+      chmod -R 755 /u02 /u03
+
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Oracle directory structure created" | tee -a /var/log/db_prep.log
+
+      # Set Oracle env variables for oracle user
+      echo 'export ORACLE_BASE=/u01/home/app/oracle' >> /home/oracle/.bashrc
+      echo 'export ORACLE_HOME=$ORACLE_BASE/product/19.0.0/dbhome_1' >> /home/oracle/.bashrc
+      echo 'export PATH=$ORACLE_HOME/bin:$PATH' >> /home/oracle/.bashrc
+      chown oracle:wheel /home/oracle/.bashrc
+
+      # Install Oracle software (software only, no database)
+      su - oracle -c "/tmp/install_oracle_software.sh"
+
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Oracle software-only installation complete" | tee -a /var/log/db_prep.log
+    fi
+
+  # Run post-restore configuration for ALL restore scenarios
+  # This ensures hostname, network, and Oracle configs are updated for new instance
+  - |
+    if [ "${restore_from_snapshot}" = "true" ]; then
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running post-restore configuration (restore_from_snapshot=true)..." | tee -a /var/log/db_prep.log
+      /tmp/post_restore_config.sh
+    fi
+
+write_files:
+  - path: /tmp/mount_data_disks.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      # Enhanced Disk Mounting Script with Idempotency and Error Handling
+      # Version: 2.0
+
+      set -o pipefail
+
+      LOG_FILE="/var/log/db_prep.log"
+      FSTAB_BACKUP="/etc/fstab.backup.$(date +%s)"
+
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] ========== DISK SETUP START ==========" | tee -a $LOG_FILE
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting disk setup..." | tee -a $LOG_FILE
+
+      RESTORE_MODE="${restore_data_disks_only}"
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Restore mode: $RESTORE_MODE" | tee -a $LOG_FILE
+
+      # Backup fstab before modifications
+      cp /etc/fstab "$FSTAB_BACKUP" 2>/dev/null || true
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Backed up /etc/fstab to $FSTAB_BACKUP" | tee -a $LOG_FILE
+
+      if [ "$RESTORE_MODE" = "true" ]; then
+        # Restore mode: Mount disks by detecting Oracle installation location
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] RESTORE MODE: Detecting disk content to mount correctly" | tee -a $LOG_FILE
+
+        mkdir -p /u01 /u02 /u03
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Created mount point directories" | tee -a $LOG_FILE
+
+        # Restore mode: mount disks by detecting content
+        ASSIGNED_U01=false
+        ASSIGNED_U02=false
+        ASSIGNED_U03=false
+        MOUNTED_COUNT=0
+
+        for disk in $(lsblk -dpno NAME 2>/dev/null | grep -v "/dev/sda" | grep -v "/dev/sdb" | grep -v "/dev/sr" | head -3); do
+          if [ ! -b "$disk" ]; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] [SKIP] Device not found: $disk" | tee -a $LOG_FILE
+            continue
+          fi
+
+          # Check if already mounted
+          if mount | grep -q "^$disk "; then
+            CURRENT_MOUNT=$(mount | grep "^$disk " | awk '{print $3}')
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] [SKIP] $disk already mounted at $CURRENT_MOUNT (idempotent)" | tee -a $LOG_FILE
+            # Mark as assigned to avoid remounting
+            case "$CURRENT_MOUNT" in
+              /u01) ASSIGNED_U01=true ;;
+              /u02) ASSIGNED_U02=true ;;
+              /u03) ASSIGNED_U03=true ;;
+            esac
+            continue
+          fi
+
+          # Mount temporarily to check content
+          TMP_MOUNT="/mnt/check_$$_$(basename $disk)"
+          mkdir -p "$TMP_MOUNT" 2>/dev/null || true
+
+          if ! mount -o ro "$disk" "$TMP_MOUNT" 2>/dev/null; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] [ERROR] Failed to temporarily mount $disk" | tee -a $LOG_FILE
+            rmdir "$TMP_MOUNT" 2>/dev/null || true
+            continue
+          fi
+
+          # Determine mount point by content (prioritize Oracle binaries, then data, then default to /u03)
+          MOUNT_POINT=""
+          if [ "$ASSIGNED_U01" = false ] && ([ -d "$TMP_MOUNT/home/app/oracle" ] || [ -d "$TMP_MOUNT/home/app/oracle/product" ]); then
+            MOUNT_POINT="/u01"
+            ASSIGNED_U01=true
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] [DETECT] Found Oracle binaries on $disk -> /u01" | tee -a $LOG_FILE
+          elif [ "$ASSIGNED_U02" = false ] && [ -d "$TMP_MOUNT/oradata" ]; then
+            MOUNT_POINT="/u02"
+            ASSIGNED_U02=true
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] [DETECT] Found Oracle datafiles on $disk -> /u02" | tee -a $LOG_FILE
+          elif [ "$ASSIGNED_U03" = false ]; then
+            MOUNT_POINT="/u03"
+            ASSIGNED_U03=true
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] [DETECT] Found other data on $disk -> /u03" | tee -a $LOG_FILE
+          fi
+
+          # Unmount temporary mount
+          umount "$TMP_MOUNT" 2>/dev/null || true
+          rmdir "$TMP_MOUNT" 2>/dev/null || true
+
+          # Mount to correct location
+          if [ -n "$MOUNT_POINT" ]; then
+            UUID=$(blkid -s UUID -o value "$disk" 2>/dev/null)
+            if [ -z "$UUID" ]; then
+              echo "[$(date '+%Y-%m-%d %H:%M:%S')] [ERROR] Could not determine UUID for $disk" | tee -a $LOG_FILE
+              continue
+            fi
+
+            # Mount the disk
+            if ! mount "$disk" "$MOUNT_POINT" 2>/dev/null; then
+              echo "[$(date '+%Y-%m-%d %H:%M:%S')] [ERROR] Failed to mount $disk to $MOUNT_POINT" | tee -a $LOG_FILE
+              continue
+            fi
+
+            # Add to fstab if not already present (idempotent)
+            if ! grep -q "UUID=$UUID" /etc/fstab; then
+              echo "UUID=$UUID $MOUNT_POINT xfs defaults,nofail 0 0" >> /etc/fstab
+              echo "[$(date '+%Y-%m-%d %H:%M:%S')] [FSTAB] Added entry: UUID=$UUID $MOUNT_POINT" | tee -a $LOG_FILE
+            else
+              echo "[$(date '+%Y-%m-%d %H:%M:%S')] [FSTAB] UUID already exists, skipped" | tee -a $LOG_FILE
+            fi
+
+            # Verify mount
+            if mountpoint -q "$MOUNT_POINT" 2>/dev/null; then
+              SIZE=$(df -h "$MOUNT_POINT" 2>/dev/null | tail -1 | awk '{print $2}')
+              USED=$(df -h "$MOUNT_POINT" 2>/dev/null | tail -1 | awk '{print $3}')
+              echo "[$(date '+%Y-%m-%d %H:%M:%S')] [MOUNT] ✓ $disk mounted to $MOUNT_POINT (UUID: $UUID) Size: $SIZE, Used: $USED" | tee -a $LOG_FILE
+              MOUNTED_COUNT=$((MOUNTED_COUNT + 1))
+            else
+              echo "[$(date '+%Y-%m-%d %H:%M:%S')] [ERROR] Mount verification failed for $MOUNT_POINT" | tee -a $LOG_FILE
+            fi
+          fi
+        done
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] RESTORE MODE: Successfully mounted $MOUNTED_COUNT disks" | tee -a $LOG_FILE
+      else
+        # Fresh mode: format and mount new disks by size (not by device order which is non-deterministic)
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Fresh mode: Creating new disks" | tee -a /var/log/db_prep.log
+
+        mkdir -p /u01 /u02 /u03
+
+        # Get disks sorted by size to ensure consistent ordering across VM recreations
+        # All data disks should be 512G, so we just mount in size order
+        DISK_COUNT=0
+        for disk in $(lsblk -dpno NAME,SIZE | grep -v "/dev/sda" | grep -v "/dev/sdb" | grep -v "/dev/sr" | awk '{print $1}' | sort); do
+          # Skip if already mounted or is a partition
+          if mount | grep -q "$disk" || [[ "$disk" == *[0-9]$ ]]; then
+            continue
+          fi
+
+          DISK_COUNT=$((DISK_COUNT + 1))
+          case $DISK_COUNT in
+            1) MOUNT_POINT="/u01" ;;
+            2) MOUNT_POINT="/u02" ;;
+            3) MOUNT_POINT="/u03" ;;
+            *) break ;;
+          esac
+
+          if [ -b "$disk" ]; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] Fresh mode: Formatting $disk for $MOUNT_POINT" | tee -a /var/log/db_prep.log
+            mkfs.xfs -f "$disk"
+            UUID=$(blkid -s UUID -o value "$disk")
+            mount "$disk" "$MOUNT_POINT"
+            echo "UUID=$UUID $MOUNT_POINT xfs defaults,nofail 0 0" >> /etc/fstab
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] Formatted and mounted $disk to $MOUNT_POINT (UUID: $UUID)" | tee -a /var/log/db_prep.log
+          fi
+        done
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Fresh mode: Mounted $DISK_COUNT disks" | tee -a /var/log/db_prep.log
+      fi
+
+  - path: /tmp/install_oracle_software.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Running Oracle Software-Only Install..." | tee -a /var/log/db_prep.log
+
+      ORACLE_BASE=/u01/home/app/oracle
+      ORACLE_HOME=$ORACLE_BASE/product/19.0.0/dbhome_1
+      RESPONSE_FILE=/tmp/db_install.rsp
+
+      # Ensure response file exists
+      if [ ! -f "$RESPONSE_FILE" ]; then
+        echo "❌ Missing response file at $RESPONSE_FILE" | tee -a /var/log/db_prep.log
+        exit 1
+      fi
+
+      cd /tmp
+      ./runInstaller -silent -responseFile $RESPONSE_FILE \
+        oracle.install.option=INSTALL_DB_SWONLY \
+        ORACLE_BASE=$ORACLE_BASE ORACLE_HOME=$ORACLE_HOME \
+        -ignorePrereq -waitforcompletion -showProgress \
+        >> /var/log/oracle_install.log 2>&1
+
+      if [ $? -eq 0 ]; then
+        echo "✅ Oracle software-only install completed successfully" | tee -a /var/log/db_prep.log
+      else
+        echo "❌ Oracle software install failed (check /var/log/oracle_install.log)" | tee -a /var/log/db_prep.log
+      fi
+
+  - path: /tmp/db_install.rsp
+    permissions: '0644'
+    content: |
+      oracle.install.option=INSTALL_DB_SWONLY
+      ORACLE_HOSTNAME=dbserver
+      UNIX_GROUP_NAME=oinstall
+      INVENTORY_LOCATION=/u01/home/app/oraInventory
+      SELECTED_LANGUAGES=en
+      ORACLE_HOME=/u01/home/app/oracle/product/19.0.0/dbhome_1
+      ORACLE_BASE=/u01/home/app/oracle
+      oracle.install.db.InstallEdition=EE
+      oracle.install.db.OSDBA_GROUP=dba
+      oracle.install.db.OSOPER_GROUP=oper
+      oracle.install.db.OSBACKUPDBA_GROUP=backupdba
+      oracle.install.db.OSDGDBA_GROUP=dgdba
+      oracle.install.db.OSKMDBA_GROUP=kmdba
+      oracle.install.db.OSRACDBA_GROUP=racdba
+      oracle.install.db.config.starterdb.type=GENERAL_PURPOSE
+      oracle.install.db.config.starterdb.globalDBName=
+      oracle.install.db.config.starterdb.SID=
+      DECLINE_SECURITY_UPDATES=true
+
+  - path: /tmp/post_restore_config.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      # Post-Restore Configuration Script
+      # Updates system and Oracle configuration after VM restore from snapshot
+
+      LOG_FILE="/var/log/db_post_restore.log"
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] ============================================" | tee -a $LOG_FILE
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting Post-Restore Configuration" | tee -a $LOG_FILE
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] ============================================" | tee -a $LOG_FILE
+
+      # ========================================
+      # 1. HOSTNAME AND NETWORK CONFIGURATION
+      # ========================================
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Step 1: Updating hostname configuration..." | tee -a $LOG_FILE
+
+      # Get current hostname from Azure metadata or use default
+      CURRENT_HOSTNAME=$(hostname)
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Current hostname: $CURRENT_HOSTNAME" | tee -a $LOG_FILE
+
+      # Get Azure VM name from metadata
+      AZURE_VM_NAME=$(curl -s -H "Metadata:true" "http://169.254.169.254/metadata/instance/compute/vmName?api-version=2021-02-01&format=json" | jq -r '.value' 2>/dev/null)
+      if [ -n "$AZURE_VM_NAME" ] && [ "$AZURE_VM_NAME" != "null" ]; then
+        NEW_HOSTNAME=$(echo $AZURE_VM_NAME | tr '[:upper:]' '[:lower:]')
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Azure VM Name: $AZURE_VM_NAME" | tee -a $LOG_FILE
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Setting hostname to: $NEW_HOSTNAME" | tee -a $LOG_FILE
+
+        # Update /etc/hostname
+        echo "$NEW_HOSTNAME" > /etc/hostname
+        hostnamectl set-hostname "$NEW_HOSTNAME"
+
+        # Update /etc/hosts
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Updating /etc/hosts..." | tee -a $LOG_FILE
+        sed -i "s/^127.0.0.1.*$/127.0.0.1   localhost $NEW_HOSTNAME/g" /etc/hosts
+        if ! grep -q "^127.0.0.1" /etc/hosts; then
+          echo "127.0.0.1   localhost $NEW_HOSTNAME" >> /etc/hosts
+        fi
+
+        # Update Oracle HOSTNAME in response files and bashrc
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Updating Oracle HOSTNAME references..." | tee -a $LOG_FILE
+        if [ -f /home/oracle/.bash_profile ]; then
+          sed -i "s/ORACLE_HOSTNAME=.*/ORACLE_HOSTNAME=$NEW_HOSTNAME/g" /home/oracle/.bash_profile
+          if ! grep -q "ORACLE_HOSTNAME" /home/oracle/.bash_profile; then
+            echo "export ORACLE_HOSTNAME=$NEW_HOSTNAME" >> /home/oracle/.bash_profile
+          fi
+          chown oracle:wheel /home/oracle/.bash_profile
+        fi
+
+        if [ -f /home/oracle/.bashrc ]; then
+          if ! grep -q "ORACLE_HOSTNAME" /home/oracle/.bashrc; then
+            echo "export ORACLE_HOSTNAME=$NEW_HOSTNAME" >> /home/oracle/.bashrc
+          else
+            sed -i "s/export ORACLE_HOSTNAME=.*/export ORACLE_HOSTNAME=$NEW_HOSTNAME/g" /home/oracle/.bashrc
+          fi
+          chown oracle:wheel /home/oracle/.bashrc
+        fi
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✓ Hostname updated to: $NEW_HOSTNAME" | tee -a $LOG_FILE
+      else
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ⚠ Could not retrieve Azure VM name from metadata" | tee -a $LOG_FILE
+      fi
+
+      # ========================================
+      # 2. NETWORK CONFIGURATION - Set unique IPs
+      # ========================================
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Step 2: Verifying network configuration..." | tee -a $LOG_FILE
+
+      # Check for RHEL/CentOS network scripts
+      NETWORK_FILES="/etc/sysconfig/network-scripts/"
+      if [ -d "$NETWORK_FILES" ]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Found network scripts directory: $NETWORK_FILES" | tee -a $LOG_FILE
+
+        # List network interface files
+        for ifcfg_file in "$NETWORK_FILES"ifcfg-*; do
+          if [ -f "$ifcfg_file" ]; then
+            interface_name=$(basename "$ifcfg_file" | sed 's/ifcfg-//')
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] Network interface: $interface_name" | tee -a $LOG_FILE
+
+            # Check if it's a template file (should be managed by Azure DHCP/cloud-init)
+            if grep -q "BOOTPROTO=dhcp\|BOOTPROTO=none" "$ifcfg_file" 2>/dev/null; then
+              echo "[$(date '+%Y-%m-%d %H:%M:%S')]   - Currently using DHCP/cloud-init (Azure managed)" | tee -a $LOG_FILE
+            else
+              echo "[$(date '+%Y-%m-%d %H:%M:%S')]   - Static configuration detected" | tee -a $LOG_FILE
+            fi
+          fi
+        done
+
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Note: Network interfaces should be managed by Azure DHCP or cloud-init" | tee -a $LOG_FILE
+      else
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Network scripts not in /etc/sysconfig/ - may be using netplan or NetworkManager" | tee -a $LOG_FILE
+      fi
+
+      # Display current network configuration
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Current network interfaces:" | tee -a $LOG_FILE
+      ip link show 2>/dev/null | grep "^[0-9]" | awk '{print $2}' | sed 's/:$//' | while read iface; do
+        ip_addr=$(ip addr show "$iface" 2>/dev/null | grep "inet " | awk '{print $2}')
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')]   - $iface: $ip_addr" | tee -a $LOG_FILE
+      done
+
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✓ Network configuration verified" | tee -a $LOG_FILE
+
+      # ========================================
+      # 3. CLEAR LOG FILES AND COMMAND HISTORY
+      # ========================================
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Step 3: Cleaning up log files and history..." | tee -a $LOG_FILE
+
+      # Clear template log files
+      for LOG in /var/log/*.log; do
+        if [ -f "$LOG" ] && [ "$LOG" != "$LOG_FILE" ]; then
+          > "$LOG"
+          echo "[$(date '+%Y-%m-%d %H:%M:%S')] Cleared: $LOG" | tee -a $LOG_FILE
+        fi
+      done
+
+      # Clear syslog
+      if [ -f /var/log/messages ]; then
+        > /var/log/messages
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Cleared: /var/log/messages" | tee -a $LOG_FILE
+      fi
+
+      # Clear audit logs
+      if [ -f /var/log/audit/audit.log ]; then
+        > /var/log/audit/audit.log
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Cleared: /var/log/audit/audit.log" | tee -a $LOG_FILE
+      fi
+
+      # Clear command history for root
+      > /root/.bash_history
+      history -c
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Cleared: /root/.bash_history" | tee -a $LOG_FILE
+
+      # Clear command history for all user home directories
+      for user_dir in /home/*; do
+        if [ -d "$user_dir" ]; then
+          username=$(basename "$user_dir")
+
+          # Clear .bash_history
+          if [ -f "$user_dir/.bash_history" ]; then
+            > "$user_dir/.bash_history"
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] Cleared: $user_dir/.bash_history" | tee -a $LOG_FILE
+          fi
+
+          # Clear .zsh_history if exists
+          if [ -f "$user_dir/.zsh_history" ]; then
+            > "$user_dir/.zsh_history"
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] Cleared: $user_dir/.zsh_history" | tee -a $LOG_FILE
+          fi
+
+          # Clear .history if exists
+          if [ -f "$user_dir/.history" ]; then
+            > "$user_dir/.history"
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] Cleared: $user_dir/.history" | tee -a $LOG_FILE
+          fi
+        fi
+      done
+
+      # Clear cloud-init logs
+      > /var/log/cloud-init.log
+      > /var/log/cloud-init-output.log
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Cleared cloud-init logs" | tee -a $LOG_FILE
+
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✓ Log files and command history cleared from all user directories" | tee -a $LOG_FILE
+
+      # ========================================
+      # 4. VERIFY AND UPDATE DISK UUIDs IN FSTAB
+      # ========================================
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Step 4: Verifying and updating disk UUIDs in /etc/fstab..." | tee -a $LOG_FILE
+
+      # Backup original fstab
+      cp /etc/fstab /etc/fstab.backup.$(date +%s)
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Backed up /etc/fstab to /etc/fstab.backup.*" | tee -a $LOG_FILE
+
+      # Verify each disk UUID in fstab matches actual device
+      for mount_point in /u01 /u02 /u03; do
+        if mountpoint -q "$mount_point" 2>/dev/null; then
+          DEVICE=$(df "$mount_point" | tail -1 | awk '{print $1}')
+          ACTUAL_UUID=$(blkid -s UUID -o value "$DEVICE" 2>/dev/null)
+
+          if [ -n "$ACTUAL_UUID" ]; then
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] $mount_point -> $DEVICE (UUID: $ACTUAL_UUID)" | tee -a $LOG_FILE
+
+            # Update fstab if UUID doesn't match
+            if grep -q "^UUID=" /etc/fstab | grep -q "$mount_point"; then
+              OLD_ENTRY=$(grep "$mount_point" /etc/fstab | grep "^UUID=")
+              NEW_ENTRY="UUID=$ACTUAL_UUID $mount_point xfs defaults,nofail 0 0"
+              sed -i "s|^UUID=.*$mount_point.*$|$NEW_ENTRY|g" /etc/fstab
+              echo "[$(date '+%Y-%m-%d %H:%M:%S')] Updated fstab entry for $mount_point" | tee -a $LOG_FILE
+            fi
+          fi
+        fi
+      done
+
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✓ fstab verification complete" | tee -a $LOG_FILE
+
+      # ========================================
+      # 5. UPDATE ORACLE CONFIGURATION FILES
+      # ========================================
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Step 5: Updating Oracle configuration files..." | tee -a $LOG_FILE
+
+      ORACLE_BASE="/u01/home/app/oracle"
+      ORACLE_HOME="$ORACLE_BASE/product/19.0.0/dbhome_1"
+      ORACLE_NETWORK_ADMIN="$ORACLE_HOME/network/admin"
+
+      if [ ! -d "$ORACLE_NETWORK_ADMIN" ]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ⚠ Oracle network admin directory not found: $ORACLE_NETWORK_ADMIN" | tee -a $LOG_FILE
+      else
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Found Oracle network admin: $ORACLE_NETWORK_ADMIN" | tee -a $LOG_FILE
+
+        # Update tnsnames.ora
+        if [ -f "$ORACLE_NETWORK_ADMIN/tnsnames.ora" ]; then
+          echo "[$(date '+%Y-%m-%d %H:%M:%S')] Updating tnsnames.ora..." | tee -a $LOG_FILE
+
+          # Replace HOST entries in tnsnames.ora with new hostname
+          if [ -n "$NEW_HOSTNAME" ]; then
+            # Find all HOST entries and update them
+            sed -i "s/HOST[[:space:]]*=[[:space:]]*[^[:space:)]*/HOST = $NEW_HOSTNAME/g" "$ORACLE_NETWORK_ADMIN/tnsnames.ora"
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✓ Updated HOST in tnsnames.ora to: $NEW_HOSTNAME" | tee -a $LOG_FILE
+          fi
+
+          # Show updated content for verification
+          echo "[$(date '+%Y-%m-%d %H:%M:%S')] tnsnames.ora HOST entries:" | tee -a $LOG_FILE
+          grep -i "HOST" "$ORACLE_NETWORK_ADMIN/tnsnames.ora" | tee -a $LOG_FILE || echo "No HOST entries found" | tee -a $LOG_FILE
+        else
+          echo "[$(date '+%Y-%m-%d %H:%M:%S')] ⚠ tnsnames.ora not found at $ORACLE_NETWORK_ADMIN/tnsnames.ora" | tee -a $LOG_FILE
+        fi
+
+        # Update listener.ora
+        if [ -f "$ORACLE_NETWORK_ADMIN/listener.ora" ]; then
+          echo "[$(date '+%Y-%m-%d %H:%M:%S')] Updating listener.ora..." | tee -a $LOG_FILE
+
+          # Replace HOST entries in listener.ora with new hostname
+          if [ -n "$NEW_HOSTNAME" ]; then
+            # Update LISTENER address
+            sed -i "s/(HOST[[:space:]]*=[[:space:]]*[^)]*)/\(HOST = $NEW_HOSTNAME\)/g" "$ORACLE_NETWORK_ADMIN/listener.ora"
+            echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✓ Updated HOST in listener.ora to: $NEW_HOSTNAME" | tee -a $LOG_FILE
+          fi
+
+          # Show updated content for verification
+          echo "[$(date '+%Y-%m-%d %H:%M:%S')] listener.ora HOST entries:" | tee -a $LOG_FILE
+          grep -i "HOST" "$ORACLE_NETWORK_ADMIN/listener.ora" | tee -a $LOG_FILE || echo "No HOST entries found" | tee -a $LOG_FILE
+        else
+          echo "[$(date '+%Y-%m-%d %H:%M:%S')] ⚠ listener.ora not found at $ORACLE_NETWORK_ADMIN/listener.ora" | tee -a $LOG_FILE
+        fi
+
+        # Set proper ownership
+        chown -R oracle:wheel "$ORACLE_NETWORK_ADMIN" 2>/dev/null || true
+        chmod -R 644 "$ORACLE_NETWORK_ADMIN"/*.ora 2>/dev/null || true
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✓ Oracle network admin files ownership and permissions set" | tee -a $LOG_FILE
+      fi
+
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✓ Oracle configuration files updated" | tee -a $LOG_FILE
+
+      # ========================================
+      # COMPLETION
+      # ========================================
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] ============================================" | tee -a $LOG_FILE
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✓ Post-Restore Configuration Complete!" | tee -a $LOG_FILE
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Review log at: $LOG_FILE" | tee -a $LOG_FILE
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] ============================================" | tee -a $LOG_FILE
+
+      # Create marker file to indicate successful post-restore configuration
+      touch /tmp/post_restore_complete
+
+  - path: /tmp/verify_restore.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      # Post-Restore Verification Script
+      # Comprehensive checks to validate disk mounts, fstab, and Oracle setup
+
+      VERIFY_LOG="/var/log/db_restore_verify.log"
+      touch $VERIFY_LOG
+      chmod 666 $VERIFY_LOG
+
+      echo "========================================" | tee -a $VERIFY_LOG
+      echo "POST-RESTORE VERIFICATION REPORT" | tee -a $VERIFY_LOG
+      echo "Generated: $(date '+%Y-%m-%d %H:%M:%S')" | tee -a $VERIFY_LOG
+      echo "========================================" | tee -a $VERIFY_LOG
+      echo "" | tee -a $VERIFY_LOG
+
+      # Counter for checks
+      CHECKS_PASSED=0
+      CHECKS_FAILED=0
+
+      echo "1. DISK MOUNTS VERIFICATION" | tee -a $VERIFY_LOG
+      echo "---" | tee -a $VERIFY_LOG
+      for mount_point in /u01 /u02 /u03; do
+        if mountpoint -q "$mount_point" 2>/dev/null; then
+          DEVICE=$(df "$mount_point" | tail -1 | awk '{print $1}')
+          UUID=$(blkid -s UUID -o value "$DEVICE" 2>/dev/null)
+          SIZE=$(df -h "$mount_point" | tail -1 | awk '{print $2}')
+          USED=$(df -h "$mount_point" | tail -1 | awk '{print $3}')
+          AVAIL=$(df -h "$mount_point" | tail -1 | awk '{print $4}')
+          echo "✓ $mount_point is MOUNTED" | tee -a $VERIFY_LOG
+          echo "  Device: $DEVICE | UUID: $UUID" | tee -a $VERIFY_LOG
+          echo "  Size: $SIZE | Used: $USED | Available: $AVAIL" | tee -a $VERIFY_LOG
+          CHECKS_PASSED=$((CHECKS_PASSED + 1))
+        else
+          echo "✗ $mount_point is NOT MOUNTED" | tee -a $VERIFY_LOG
+          CHECKS_FAILED=$((CHECKS_FAILED + 1))
+        fi
+      done
+      echo "" | tee -a $VERIFY_LOG
+
+      echo "2. FSTAB ENTRIES VERIFICATION" | tee -a $VERIFY_LOG
+      echo "---" | tee -a $VERIFY_LOG
+      FSTAB_COUNT=$(grep -c "^UUID=.*xfs" /etc/fstab 2>/dev/null || echo "0")
+      echo "Total UUID entries in fstab: $FSTAB_COUNT" | tee -a $VERIFY_LOG
+      if [ "$FSTAB_COUNT" -ge 3 ]; then
+        echo "✓ fstab has correct number of entries" | tee -a $VERIFY_LOG
+        grep "^UUID=" /etc/fstab | grep "/u0" | tee -a $VERIFY_LOG
+        CHECKS_PASSED=$((CHECKS_PASSED + 1))
+      else
+        echo "✗ fstab missing entries (found $FSTAB_COUNT, expected 3)" | tee -a $VERIFY_LOG
+        CHECKS_FAILED=$((CHECKS_FAILED + 1))
+      fi
+      echo "" | tee -a $VERIFY_LOG
+
+      echo "3. ORACLE USER VERIFICATION" | tee -a $VERIFY_LOG
+      echo "---" | tee -a $VERIFY_LOG
+      if id oracle >/dev/null 2>&1; then
+        ORACLE_UID=$(id -u oracle)
+        ORACLE_GID=$(id -g oracle)
+        ORACLE_GROUPS=$(id -G oracle)
+        echo "✓ Oracle user exists (UID: $ORACLE_UID, GID: $ORACLE_GID)" | tee -a $VERIFY_LOG
+        echo "  Groups: $ORACLE_GROUPS" | tee -a $VERIFY_LOG
+        CHECKS_PASSED=$((CHECKS_PASSED + 1))
+      else
+        echo "✗ Oracle user does not exist" | tee -a $VERIFY_LOG
+        CHECKS_FAILED=$((CHECKS_FAILED + 1))
+      fi
+      echo "" | tee -a $VERIFY_LOG
+
+      echo "4. ORACLE DIRECTORY STRUCTURE VERIFICATION" | tee -a $VERIFY_LOG
+      echo "---" | tee -a $VERIFY_LOG
+      ORACLE_DIRS=("/u01/home/app/oracle" "/u01/home/app/oracle/product" "/u01/home/app/oracle/admin" "/u01/home/app/oracle/audit")
+      for dir in "${ORACLE_DIRS[@]}"; do
+        if [ -d "$dir" ]; then
+          OWNER=$(ls -ld "$dir" | awk '{print $3":"$4}')
+          echo "✓ Directory exists: $dir (Owner: $OWNER)" | tee -a $VERIFY_LOG
+          CHECKS_PASSED=$((CHECKS_PASSED + 1))
+        else
+          echo "✗ Directory missing: $dir" | tee -a $VERIFY_LOG
+          CHECKS_FAILED=$((CHECKS_FAILED + 1))
+        fi
+      done
+      echo "" | tee -a $VERIFY_LOG
+
+      echo "5. LOG FILES VERIFICATION" | tee -a $VERIFY_LOG
+      echo "---" | tee -a $VERIFY_LOG
+      LOG_FILES=("/var/log/db_prep.log" "/var/log/oracle_install.log" "/var/log/db_post_restore.log")
+      for logfile in "${LOG_FILES[@]}"; do
+        if [ -f "$logfile" ]; then
+          SIZE=$(ls -lh "$logfile" | awk '{print $5}')
+          LINES=$(wc -l < "$logfile")
+          echo "✓ Log file exists: $logfile (Size: $SIZE, Lines: $LINES)" | tee -a $VERIFY_LOG
+          CHECKS_PASSED=$((CHECKS_PASSED + 1))
+        else
+          echo "✗ Log file missing: $logfile" | tee -a $VERIFY_LOG
+          CHECKS_FAILED=$((CHECKS_FAILED + 1))
+        fi
+      done
+      echo "" | tee -a $VERIFY_LOG
+
+      echo "6. DISK SPACE VERIFICATION" | tee -a $VERIFY_LOG
+      echo "---" | tee -a $VERIFY_LOG
+      for mount_point in /u01 /u02 /u03; do
+        if mountpoint -q "$mount_point" 2>/dev/null; then
+          AVAIL_PERCENT=$(df "$mount_point" | tail -1 | awk '{print $5}')
+          AVAIL_GB=$(df -B G "$mount_point" | tail -1 | awk '{print $4}')
+          if [ "${AVAIL_PERCENT%\%}" -lt 90 ]; then
+            echo "✓ $mount_point has sufficient space ($AVAIL_GB available, $AVAIL_PERCENT used)" | tee -a $VERIFY_LOG
+            CHECKS_PASSED=$((CHECKS_PASSED + 1))
+          else
+            echo "✗ $mount_point is getting full ($AVAIL_PERCENT used)" | tee -a $VERIFY_LOG
+            CHECKS_FAILED=$((CHECKS_FAILED + 1))
+          fi
+        fi
+      done
+      echo "" | tee -a $VERIFY_LOG
+
+      echo "========================================" | tee -a $VERIFY_LOG
+      echo "VERIFICATION SUMMARY" | tee -a $VERIFY_LOG
+      echo "Checks Passed: $CHECKS_PASSED" | tee -a $VERIFY_LOG
+      echo "Checks Failed: $CHECKS_FAILED" | tee -a $VERIFY_LOG
+
+      if [ "$CHECKS_FAILED" -eq 0 ]; then
+        echo "STATUS: ✓ ALL CHECKS PASSED" | tee -a $VERIFY_LOG
+        exit 0
+      else
+        echo "STATUS: ✗ SOME CHECKS FAILED - Review /var/log/db_restore_verify.log" | tee -a $VERIFY_LOG
+        exit 1
+      fi
+      echo "========================================" | tee -a $VERIFY_LOG
+
+final_message: "Database VM ready. Oracle software-only install completed (no DB created). Post-restore configuration applied. Run '/tmp/verify_restore.sh' to verify setup."
